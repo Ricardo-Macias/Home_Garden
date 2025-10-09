@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS huerto (
 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idSensor INT NOT NULL,
     idCultivo INT NOT NULL,
+    fechaInicio DATE NOT NULL,
+    fechaEstimada DATE,
     FOREIGN KEY(idSensor) REFERENCES sensor(id),
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
 );
