@@ -19,4 +19,4 @@ export async function getUserByID(id) {
    return row[0];
 }
 
-getUsuarioByID(1);
+// AGREGAR LAS CONSULTAS
