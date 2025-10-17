@@ -7,7 +7,9 @@ node_modules/
 .expo/
 dist/
 web-build/
+expo-env.d.
 expo-env.d.ts
+# @end expo-cli
 
 # Native
 .kotlin/
