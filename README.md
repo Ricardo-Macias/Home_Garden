@@ -15,10 +15,10 @@
 ```
 ## 4. Create ./serve/ env
 <p>
-    MYSQL_HOST = ""
-    MYSQL_USER = ""
-    MYSQL_PASSWORD = ""
-    MYSQL_DATABASE = ""
+    MYSQL_HOST = "" <br>
+    MYSQL_USER = "" <br>
+    MYSQL_PASSWORD = "" <br>
+    MYSQL_DATABASE = "" <br>
 </p>
 
 ## 5. Create ./home_garden/ .env
