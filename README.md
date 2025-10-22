@@ -13,7 +13,7 @@
 ```bash
 ./expo.sh
 ```
-## 4. Create ./serve/ env
+## 4. Create ./serve/.env
 <p>
     MYSQL_HOST = "" <br>
     MYSQL_USER = "" <br>
@@ -21,7 +21,7 @@
     MYSQL_DATABASE = "" <br>
 </p>
 
-## 5. Create ./home_garden/ .env
+## 5. Create ./home_garden/.env
 <p>
     API_URL = your IPV4
 </p>
