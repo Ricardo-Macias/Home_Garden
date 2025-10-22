@@ -1,11 +1,8 @@
 #!/bin/bash
-if [ -f "home_garden" ]; then
-    cd home_garden
-    npm install
-    cd ..
-fi
+cd home_garden
+npm install
+cd ..
 
-if [ -f "server" ]; then
-    cd server
-    npm install
-fi
+
+cd server
+npm install
