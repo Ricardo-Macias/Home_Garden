@@ -24,9 +24,17 @@ export default function TabsLayout() {
             } } />
             <Tabs.Screen name="explore" options={{
                 tabBarLabel: "Explorar",
+                tabBarIcon: ({ focused, color }) => <Ionicons
+                    name={focused ? "search" : "search-outline"}
+                    color={color}
+                    size={24} />
             } } />
             <Tabs.Screen name="perfile" options={{
                 tabBarLabel: "Perfil",
+                tabBarIcon: ({ focused, color }) => <Ionicons
+                    name={focused ? "person-circle" : "person-circle-outline"}
+                    color={color}
+                    size={24} />,
             }} />
         </Tabs>
     );
