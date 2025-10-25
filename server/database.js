@@ -11,12 +11,41 @@ const pool = mysql
     })
     .promise();
 
-export async function getUserByID(id) {
-    const [row] = await pool.query(
-        `SELECT * FROM usuario WHERE id = ?`,
+/*
+ *  Consultas en la tabla usuario
+*/
+
+export async function login(email, pass) {
+    const [result] = await pool.query(
+        `SELECT * FROM usuario WHERE correo = ?`,
+        [email]
+    );
+
+    return result[0]['pass'] == pass ? result[0] : false;
+}
+
+export async function insertUser(name, lastName, email, pass) {
+    const [result] = await pool.query(
+        `INSERT INTO (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
+        [name, lastName, email, pass]
+    );
+
+    return result
+}
+
+export async function deleteUser(id) {
+    const [result] = await pool.query(
+        `DELETE FROM usuario WHERE id = ?`,
         [id]
     );
-   return row[0];
+}
+
+export async function updateUser(email, pass) {
+    const [result] = await pool.query(
+        `UPDATE usuario SET correo = ?, pass = ?`,
+        [email, pass]
+    );
+    return result
 }
 
 /*
@@ -93,3 +122,7 @@ export async function updateGarden(id, idCrop) {
     );
     return result
 }
+
+/*
+ *  Consultas en la tabla cultivo
+*/
