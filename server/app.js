@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    getUserByID,
+    getSensors,
 } from "./database.js";
 import cors from 'cors';
 
@@ -15,8 +15,8 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 // PRUEBA
-app.get("/user/:id", async (req, res) => {
-    const user = await getUserByID(req.params.id);
+app.get("/sensor/:id", async (req, res) => {
+    const user = await getSensors(req.params.id);
     res.status(200).send(user);
 });
 
