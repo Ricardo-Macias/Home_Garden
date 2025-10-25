@@ -126,3 +126,30 @@ export async function updateGarden(id, idCrop) {
 /*
  *  Consultas en la tabla cultivo
 */
+
+export async function getAllCrop() {
+    const [row] = await pool.query(
+        `SELECT * FROM cultivo`
+    );
+
+    return row[0];
+}
+
+export async function insertCrop(name, kind, difficult, description, tips) {
+    const [result] = await pool.query(
+        `INSERT INTO huerto (nombre, tipo, dificultad, descripcion, consejos)
+        VALUES (?, ?, ?, ?, ?)`,
+        [name, kind, difficult, description, tips]
+    );
+
+    return result;
+}
+
+export async function searchCrop(name) {
+    conts[result] = await pool.query(
+        `SELECT * FROM cultivo WHERE nombre = ?`,
+        [name]
+    );
+
+    return result;
+}
