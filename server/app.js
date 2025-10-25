@@ -1,6 +1,9 @@
 import express from "express";
 import {
+    getAllCrop,
+    getGarden,
     getSensors,
+    login,
 } from "./database.js";
 import cors from 'cors';
 
@@ -14,10 +17,40 @@ const app = express();
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// PRUEBA
-app.get("/sensor/:id", async (req, res) => {
-    const user = await getSensors(req.params.id);
+/**
+ * USUARIO
+ */
+
+app.get("/user/:email/:pass", async (req, res) => {
+    const user = await login(req.params.email, req.params.pass);
     res.status(200).send(user);
+});
+
+/**
+ * SENSORES
+ */
+
+app.get("/sensor/:id", async (req, res) => {
+    const sensor = await getSensors(req.params.id);
+    res.status(200).send(sensor);
+});
+
+/**
+ * HUERTO
+ */
+
+app.get("/garden/:id", async (req, res) => {
+    const garden = await getGarden(req.params.id);
+    res.status(200).send(garden);
+});
+
+/**
+ * CULTIVO
+ */
+
+app.get("/crop", async (req, res) => {
+    const crop = await getAllCrop();
+    res.status(200).send(crop);
 });
 
 /*
