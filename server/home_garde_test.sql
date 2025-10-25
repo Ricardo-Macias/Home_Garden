@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS usuario (
 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL,
     apellidos VARCHAR(180) NOT NULL,
-    correo VARCHAR(180) NOT NULL,
-    pass VARCHAR(80) NOT NULL
+    correo VARCHAR(180) NOT NULL UNIQUE,
+    pass VARCHAR(80) NOT NULL,
+    imagen VARCHAR(250)
 );
 
 CREATE TABLE IF NOT EXISTS cultivo (
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS cultivo (
     nombre VARCHAR(180) NOT NULL,
     tipo VARCHAR(80) NOT NULL,
     dificultad CHAR(10) NOT NULL,
+    duracion INT NOT NULL,
     descripcion VARCHAR(280) NOT NULL,
     consejos VARCHAR(280) NOT NULL
 );
