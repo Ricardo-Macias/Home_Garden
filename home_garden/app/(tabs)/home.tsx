@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
+import Botton from "../../components/bottonHome"
 import Constants from "expo-constants";
 
 interface AppConfig {
@@ -26,6 +27,7 @@ export default function Home() {
         <View style={styles.container}>
             <Text> Bienvenido </Text>
             <Text>{ JSON.stringify(users) }</Text>
+            <Botton />
         </View>
     );
 }
