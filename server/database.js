@@ -20,18 +20,19 @@ export async function login(email, pass) {
         `SELECT * FROM usuario WHERE correo = ?`,
         [email]
     );
-
-    return result[0]['pass'] == pass ? result[0] : false;
+    return result[0]?.pass === pass ? result[0] : false;
 }
+
 
 export async function insertUser(name, lastName, email, pass) {
     const [result] = await pool.query(
-        `INSERT INTO (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO usuario (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
         [name, lastName, email, pass]
     );
 
     return result
 }
+
 
 export async function deleteUser(id) {
     const [result] = await pool.query(

@@ -26,6 +26,34 @@ app.get("/user/:email/:pass", async (req, res) => {
     res.status(200).send(user);
 });
 
+app.post("/login", async (req, res) => {
+    const { email, pass } = req.body;
+    const user = await login(email, pass);
+    if (!user) {
+        return res.status(401).json({ error: "Credenciales inválidas" });
+    }
+    res.status(200).json(user);
+});
+
+
+import { insertUser } from "./database.js";
+
+app.post("/register", async (req, res) => {
+    const { nombre, apellidos, correo, pass } = req.body;
+
+    if (!nombre || !apellidos || !correo || !pass) {
+        return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
+
+    try {
+        const result = await insertUser(nombre, apellidos, correo, pass);
+        res.status(201).json({ message: "Usuario creado correctamente", result });
+    } catch (error) {
+        console.error("Error al registrar usuario:", error);
+        res.status(500).json({ error: "No se pudo registrar el usuario" });
+    }
+});
+
 /**
  * SENSORES
  */

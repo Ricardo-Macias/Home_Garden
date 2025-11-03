@@ -17,6 +17,7 @@ interface LoginFormProps {
     onPassChange: (text: string) => void;
     onSubmit: () => void;
     loading?: boolean;
+    onSignupPress: () => void;
 }
 
 export default function LoginForm({
@@ -26,6 +27,7 @@ export default function LoginForm({
     onPassChange,
     onSubmit,
     loading = false,
+    onSignupPress,
 }: LoginFormProps) {
     return (
     <View style={styles.container}>
@@ -75,9 +77,14 @@ export default function LoginForm({
             <Text style={styles.googleText}>Sign in with Google</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footer}>
-            Don't have an account already? <Text style={styles.signup}>Signup</Text>
-        </Text>
+
+        <View style={styles.footer}>
+            <Text style={styles.footerText}>
+                Don't have an account already?{" "}
+                <Text style={styles.signup} onPress={onSignupPress}>signup</Text>
+            </Text>
+        </View>
+
     </View>
   );
 }
@@ -162,8 +169,14 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#333",
     },
+    footerText: {
+        fontSize: 14,
+        color: "#333",
+    },
     signup: {
+        fontSize: 14,
         color: "#6A1B9A",
         fontWeight: "bold",
     },
+
 });
