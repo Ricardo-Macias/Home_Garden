@@ -21,7 +21,7 @@ export default function Home() {
         const data = await response.json();
 
         setUser(data);
-    }
+    };
 
     return (
         <View style={styles.container}>
