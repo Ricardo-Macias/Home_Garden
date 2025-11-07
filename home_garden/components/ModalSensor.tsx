@@ -44,6 +44,7 @@ export default function ModalSensor({ isVisible, children, onClose }: Props){
                 <View style={styles.sensorsContainer}>
                     {
                         sensors.map((item) => <TouchableOpacity
+                            key={item.id}
                             style={styles.sensorsItem}
                             onPress={handleSensor}>
                                 <Text style={styles.sensorItemText}>{item.name}</Text>
