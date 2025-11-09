@@ -132,7 +132,7 @@ export async function getAllCrop() {
         `SELECT * FROM cultivo`
     );
 
-    return row[0];
+    return row;
 }
 
 export async function insertCrop(name, kind, difficult, description, tips) {
