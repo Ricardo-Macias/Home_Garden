@@ -27,7 +27,7 @@ export default function ComponentsProfile({
     return(
         <View style={styles.container}>
             <TouchableOpacity style={styles.settingsButton} onPress={onSettings}>
-                <MaterialIcons name="settings" size={24} color="6A1B9A"/>
+                <MaterialIcons name="settings" size={24} color="#6A1B9A"/>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
