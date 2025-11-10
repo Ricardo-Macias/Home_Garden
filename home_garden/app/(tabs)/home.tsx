@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
-import ButtonAddSensor from "../../components/buttonSensor"
+import ButtonAddSensor from "../../components/Sensor/buttonSensor"
 import Constants from "expo-constants";
 
 interface AppConfig {
