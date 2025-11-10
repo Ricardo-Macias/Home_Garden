@@ -25,6 +25,7 @@ export default function FormSensor(){
             title: "Agregar sensor"
         });
     }, [navigation]);
+    // ----------------------
 
     interface Crop {
         id: number;
@@ -87,7 +88,7 @@ export default function FormSensor(){
             </View>
 
             <TouchableOpacity onPress={handleHome} style={styles.Button}>
-                <Text>Boton</Text>
+                <Text>Registrar sensor</Text>
             </TouchableOpacity>
         </View>
     );
@@ -119,6 +120,8 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         backgroundColor: "#6a1b9a",
+        justifyContent: "center",
+        alignItems: "center",
     },
     Label: {
         fontSize: 16,
