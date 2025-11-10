@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity ,Text, Modal } from 'react-native';
-import ModalSensor from "@/components/ModalSensor"
+import ModalSensor from "@/components/Sensor/ModalSensor"
 
 export default function ButtonAddSensor(){
   const [modalVisible, setModalVisible] = useState(false);

@@ -19,46 +19,38 @@ export default function FormSensor(){
     const router = useRouter();
     const navigation = useNavigation();
 
-    type Crop = {
-        id: number;
-        nombre: string;
-        tipo: string;
-        dificultad: string;
-        duracion: number;
-        descripcion: string;
-        consejo: string;
-    }
-
-    const [crop, setCrop] = useState<Crop[]>([]);
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    async function fetchData(){
-        const response = await fetch(`${config.API_URL}/crop`);
-        const data = await response.json();
-
-        setCrop(data);
-    }
-
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
-        {label: "Apple", value: "apple"},
-        {label: "Banana", value: "banana"}
-    ]);
-
-    const handleHome = () => {
-        router.push("/(tabs)/home");
-    }
-
     // Cambia el encabezado
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Agregar sensor"
         });
     }, [navigation]);
+    // ----------------------
+
+    interface Crop {
+        id: number;
+        nombre: string;
+    }
+
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
+    const [items, setItems] = useState<{ label: string; value: string}[]>([]);
+
+    useEffect(() => {
+        fetch(`${config.API_URL}/crop`)
+            .then((res) => res.json())
+            .then((data: Crop[]) => {
+                const options = data.map((item) => ({
+                    label: item.nombre,
+                    value: item.nombre,
+                }));
+                setItems(options);
+            });
+    }, []);
+
+    const handleHome = () => {
+        router.push("/(tabs)/home");
+    }
     
     return (
         <View style={styles.container}>
@@ -91,18 +83,12 @@ export default function FormSensor(){
                     />
             </View>
 
-            <Text> { JSON.stringify(crop[0]?.nombre) } </Text>
-
-            <View >
-
-            </View>
-
             <View style={{margin: 10}}>
                 <Button label="Tomar foto" theme="primary" />
             </View>
 
             <TouchableOpacity onPress={handleHome} style={styles.Button}>
-                <Text>Boton</Text>
+                <Text>Registrar sensor</Text>
             </TouchableOpacity>
         </View>
     );
@@ -134,6 +120,8 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         backgroundColor: "#6a1b9a",
+        justifyContent: "center",
+        alignItems: "center",
     },
     Label: {
         fontSize: 16,
