@@ -4,6 +4,7 @@ import Constants from "expo-constants";
 import LoginForm from "../components/LoginForm";
 import CreateUserForm from "../components/CreateUserForm";
 import { useRouter } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 
 const config = Constants.expoConfig?.extra || { API_URL: "" };
 
