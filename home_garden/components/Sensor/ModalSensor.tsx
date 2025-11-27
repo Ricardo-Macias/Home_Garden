@@ -1,6 +1,7 @@
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import ScanDevicesBluetooth from "../Bluetooth/ScanDevices";
 
 type Props = {
     isVisible: boolean;
@@ -42,14 +43,7 @@ export default function ModalSensor({ isVisible, children, onClose }: Props){
                 </View>
                 {children}
                 <View style={styles.sensorsContainer}>
-                    {
-                        sensors.map((item) => <TouchableOpacity
-                            key={item.id}
-                            style={styles.sensorsItem}
-                            onPress={handleSensor}>
-                                <Text style={styles.sensorItemText}>{item.name}</Text>
-                            </TouchableOpacity>)
-                    }
+                    <ScanDevicesBluetooth />
                 </View>
             </View>
         </Modal>
