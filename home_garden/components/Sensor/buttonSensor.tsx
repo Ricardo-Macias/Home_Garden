@@ -2,15 +2,18 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity ,Text, Modal } from 'react-native';
 import ModalSensor from "@/components/Sensor/ModalSensor"
+import useBLE from "@/components/Bluetooth/Permissions"
 
 export default function ButtonAddSensor(){
   const [modalVisible, setModalVisible] = useState(false);
+  const { requestPermissions } = useBLE();
 
   const onModalClose = () => {
     setModalVisible(false);
   };
 
-  const onModalOpen = () => {
+  const onModalOpen = async () => {
+    await requestPermissions();
     setModalVisible(true);
   }
 
