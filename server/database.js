@@ -15,39 +15,62 @@ const pool = mysql
  *  Consultas en la tabla usuario
 */
 
-export async function login(email, pass) {
-    const [result] = await pool.query(
-        `SELECT * FROM usuario WHERE correo = ?`,
-        [email]
-    );
-    return result[0]?.pass === pass ? result[0] : false;
-}
 
-
+// INSERTAR USUARIO: guarda contraseña cifrada
 export async function insertUser(name, lastName, email, pass) {
     const [result] = await pool.query(
         `INSERT INTO usuario (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
-        [name, lastName, email, pass]
+        [name, lastName, email, pass] 
     );
-
-    return result
+    return result;
 }
 
+export async function login(email, pass) {
+    const [rows] = await pool.query(
+        `SELECT * FROM usuario WHERE correo = ? AND pass = ?`,
+        [email, pass] 
+    );
+    return rows[0] || false;
+}
 
+// BUSCAR POR CORREO (para validar duplicados)
+export async function findUserByCorreo(correo) {
+    const [rows] = await pool.query(
+        `SELECT * FROM usuario WHERE correo = ?`,
+        [correo]
+    );
+    return rows.length > 0 ? rows[0] : null;
+}
+
+// BUSCAR POR NOMBRE COMPLETO (para validar duplicados)
+export async function findUserByNombreCompleto(nombreCompleto) {
+    const [rows] = await pool.query(
+        `SELECT * FROM usuario WHERE CONCAT(nombre, ' ', apellidos) = ?`,
+        [nombreCompleto]
+    );
+    return rows.length > 0 ? rows[0] : null;
+}
+
+// OBTENER USUARIO POR ID
+export async function getUserById(id) {
+    const [rows] = await pool.query(
+        `SELECT id, nombre, apellidos, correo FROM usuario WHERE id = ?`,
+        [id]
+    );
+    return rows[0];
+}
+
+// ELIMINAR USUARIO
 export async function deleteUser(id) {
     const [result] = await pool.query(
         `DELETE FROM usuario WHERE id = ?`,
         [id]
     );
+    return result.affectedRows > 0; // true si se eliminó
 }
 
-export async function updateUser(email, pass) {
-    const [result] = await pool.query(
-        `UPDATE usuario SET correo = ?, pass = ?`,
-        [email, pass]
-    );
-    return result
-}
+
+
 
 /*
  *  Consultas en la tabla sensor 
