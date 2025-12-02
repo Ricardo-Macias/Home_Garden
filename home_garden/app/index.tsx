@@ -6,7 +6,7 @@ import CreateUserForm from "../components/CreateUserForm";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useDispatch } from "react-redux";
-import { setUserId } from "./store/slices/userSlice";
+import { setUserId } from "../store/slices/userSlice";
 import MessageBox from "../components/MessageBox";
 
 
