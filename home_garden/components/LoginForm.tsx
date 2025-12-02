@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -9,6 +9,9 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context"; // Respetar el area del telefono
+import FormStyle from "../styles/FormStyle";
+import MessageBox from "./MessageBox";
 
 interface LoginFormProps {
     email: string;
@@ -18,6 +21,9 @@ interface LoginFormProps {
     onSubmit: () => void;
     loading?: boolean;
     onSignupPress: () => void;
+    message?: string | null;
+    messageType?: "error" | "success" | "info"; 
+    onCloseMessage?: () => void; 
 }
 
 export default function LoginForm({
@@ -28,21 +34,27 @@ export default function LoginForm({
     onSubmit,
     loading = false,
     onSignupPress,
+    message,
+    messageType = "info",
+    onCloseMessage,
 }: LoginFormProps) {
+    const [showPass, setShowPass] = useState(false);
+
     return (
-    <View style={styles.container}>
+    
+    <SafeAreaView style={FormStyle.container}>
         <Image
             source={require("../assets/images/Mora.png")}
-            style={styles.image}
+            style={FormStyle.image}
             resizeMode="contain"
         />
-        <Text style={styles.title}>Home Garden</Text>
-        <Text style={styles.subtitle}>Account Login</Text>
+        <Text style={FormStyle.title}>Home Garden</Text>
+        <Text style={FormStyle.subtitle}>Account Login</Text>
 
-        <View style={styles.inputContainer}>
-            <MaterialIcons name="email" size={20} color="#6A1B9A" style={styles.icon}/>
+        <View style={FormStyle.inputContainer}>
+            <MaterialIcons name="email" size={20} color="#6A1B9A" style={FormStyle.icon}/>
             <TextInput
-                style={styles.input}
+                style={FormStyle.input}
                 placeholder="Ricardo@gmail.com"
                 value={email}
                 onChangeText={onEmailChange}
@@ -51,132 +63,55 @@ export default function LoginForm({
             />
         </View>
 
-        <View style={styles.inputContainer}>
-            <FontAwesome name="lock" size={20} color="#6A1B9A" style={styles.icon}/>
+        <View style={FormStyle.inputContainer}>
+            <FontAwesome name="lock" size={20} color="#6A1B9A" style={FormStyle.icon}/>
             <TextInput
-                style={styles.input}
+                style={FormStyle.input}
                 placeholder="••••••••"
                 value={pass}
                 onChangeText={onPassChange}
-                secureTextEntry
+                secureTextEntry={!showPass}
                 placeholderTextColor="#999"
             />
-            <MaterialIcons name="visibility-off" size={20} color="#999" style={styles.iconRight}/>
+            <TouchableOpacity onPress={() => setShowPass(!showPass)}>
+                <MaterialIcons
+                    name={showPass ? "visibility" : "visibility-off"} 
+                    size={20}
+                    color="#999"
+                    style={FormStyle.iconRight}
+                />
+            </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={onSubmit} disabled={loading}>
+        {message && (
+            <MessageBox
+                type={messageType}
+                message={message}
+                onClose={onCloseMessage}
+            />
+        )}
+
+        <TouchableOpacity style={FormStyle.loginButton} onPress={onSubmit} disabled={loading}>
             {loading ? (
                 <ActivityIndicator color="#fff" />
             ) : (
-                <Text style={styles.loginText}>Login</Text>
+                <Text style={FormStyle.loginText}>Login</Text>
             )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.googleButton}>
-            <FontAwesome name="google" size={20} color="#fff" style={styles.icon}/>
-            <Text style={styles.googleText}>Sign in with Google</Text>
+        <TouchableOpacity style={FormStyle.googleButton}>
+            <FontAwesome name="google" size={20} color="#fff" style={FormStyle.icon}/>
+            <Text style={FormStyle.googleText}>Sign in with Google</Text>
         </TouchableOpacity>
 
 
-        <View style={styles.footer}>
-            <Text style={styles.footerText}>
-                Don't have an account already?{" "}
-                <Text style={styles.signup} onPress={onSignupPress}>signup</Text>
+        <View style={FormStyle.footer}>
+            <Text style={FormStyle.footerText}>
+                No tines una cuenta aun?{" "}
+                <Text style={FormStyle.signup} onPress={onSignupPress}>Registrate</Text>
             </Text>
         </View>
 
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-    container:{
-        flex: 1,
-        backgroundColor: "#fff",
-        paddingHorizontal: 24,
-        paddingTop: 60,
-        alignItems: "center",
-    },
-    image: {
-        width: 140,
-        height: 140,
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 26,
-        fontWeight: "bold",
-        color: "#6A1B9A",
-    },
-    subtitle: {
-        fontSize: 16,
-        color: "#333",
-        marginBottom: 30,
-    },
-    inputContainer:{
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        marginBottom: 16,
-        width: "100%",
-        backgroundColor: "#f9f9f9",
-    },
-    input: {
-        flex: 1,
-        height: 48,
-        fontSize: 16,
-        color: "#333",
-    },
-    icon: {
-        marginRight: 8,
-    },
-    iconRight: {
-        marginLeft: 8,
-    },
-    loginButton: {
-        backgroundColor: "#6A1B9A",
-        borderRadius: 10,
-        paddingVertical: 14,
-        width: "100%",
-        alignItems: "center",
-        marginTop: 10,
-    },
-    loginText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    googleButton: {
-        backgroundColor: "#00913f",
-        borderRadius: 10,
-        paddingVertical: 14,
-        width: "100%",
-        alignItems: "center",
-        marginTop: 12,
-        flexDirection: "row",
-        justifyContent: "center",
-    },
-    googleText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "bold",
-        marginLeft: 8,
-    },
-    footer: {
-        marginTop: 20,
-        fontSize: 14,
-        color: "#333",
-    },
-    footerText: {
-        fontSize: 14,
-        color: "#333",
-    },
-    signup: {
-        fontSize: 14,
-        color: "#6A1B9A",
-        fontWeight: "bold",
-    },
-
-});
