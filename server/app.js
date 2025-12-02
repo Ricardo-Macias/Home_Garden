@@ -21,38 +21,90 @@ app.use(cors(corsOptions));
  * USUARIO
  */
 
-app.get("/user/:email/:pass", async (req, res) => {
-    const user = await login(req.params.email, req.params.pass);
-    res.status(200).send(user);
-});
-
 app.post("/login", async (req, res) => {
     const { email, pass } = req.body;
-    const user = await login(email, pass);
-    if (!user) {
-        return res.status(401).json({ error: "Credenciales inválidas" });
+
+    if (!email || !pass) {
+        return res.status(400).json({ error: "Correo y contraseña son requeridos" });
     }
-    res.status(200).json(user);
+
+    try {
+        const user = await login(email, pass); // bcrypt.compare internamente
+        if (!user) {
+            return res.status(401).json({ error: "Credenciales inválidas" });
+        }
+
+        res.status(200).json({ message: "Login exitoso", user });
+    } catch (error) {
+        console.error("Error en login:", error);
+        res.status(500).json({ error: "No se pudo iniciar sesión, revisa que los datos sean correctos" });
+    }
 });
 
 
-import { insertUser } from "./database.js";
+
+import { insertUser, findUserByCorreo, findUserByNombreCompleto } from "./database.js";
 
 app.post("/register", async (req, res) => {
     const { nombre, apellidos, correo, pass } = req.body;
 
+    // Validar campos vacíos
     if (!nombre || !apellidos || !correo || !pass) {
         return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
+    // Validar contraseña segura
+    const passRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!passRegex.test(pass)) {
+        return res.status(400).json({
+            error: "La contraseña debe tener mínimo 8 caracteres, incluir letras y números.",
+        });
+    }
+
     try {
+        // valida el nombre completo duplicado
+        const nombreCompleto = `${nombre.trim()} ${apellidos.trim()}`;
+        const existingByName = await findUserByNombreCompleto(nombreCompleto);
+        if (existingByName) {
+            return res.status(400).json({
+                error: "Este nombre completo ya tiene una cuenta.",
+            });
+        }
+
+        // valida si el correo esta duplicado
+        const existingByCorreo = await findUserByCorreo(correo);
+        if (existingByCorreo) {
+            return res.status(400).json({
+                error: "Este correo ya está registrado.",
+            });
+        }
+
+        // inserta usuario
         const result = await insertUser(nombre, apellidos, correo, pass);
         res.status(201).json({ message: "Usuario creado correctamente", result });
+
     } catch (error) {
         console.error("Error al registrar usuario:", error);
         res.status(500).json({ error: "No se pudo registrar el usuario" });
     }
 });
+
+
+import { getUserById } from "./database.js";
+
+app.get("/user/:id", async (req, res) => {
+    try {
+        const user = await getUserById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error("Error al consultar usuario:", error);
+        res.status(500).json({ error: "Error en el servidor" });
+    }
+});
+
 
 /**
  * SENSORES
