@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 dotenv.config();
 
 const pool = mysql
@@ -16,37 +17,40 @@ const pool = mysql
 */
 
 
+
 // INSERTAR USUARIO: guarda contraseña cifrada
 export async function insertUser(name, lastName, email, pass) {
+    // genera hash con salt de 10 rondas
+    const hashedPass = await bcrypt.hash(pass, 10);
+
     const [result] = await pool.query(
         `INSERT INTO usuario (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
-        [name, lastName, email, pass] 
+        [name, lastName, email, hashedPass]
     );
     return result;
 }
 
+// LOGIN: compara contraseña ingresada con hash guardado
 export async function login(email, pass) {
     const [rows] = await pool.query(
-        `SELECT * FROM usuario WHERE correo = ? AND pass = ?`,
-        [email, pass] 
+        `SELECT * FROM usuario WHERE correo = ?`,
+        [email]
     );
-    return rows[0] || false;
+
+    if (!rows[0]) return false;
+
+    // Compara contraseña ingresada con la cifrada
+    const match = await bcrypt.compare(pass, rows[0].pass);
+
+    return match ? rows[0] : false;
 }
+
 
 // BUSCAR POR CORREO (para validar duplicados)
 export async function findUserByCorreo(correo) {
     const [rows] = await pool.query(
         `SELECT * FROM usuario WHERE correo = ?`,
         [correo]
-    );
-    return rows.length > 0 ? rows[0] : null;
-}
-
-// BUSCAR POR NOMBRE COMPLETO (para validar duplicados)
-export async function findUserByNombreCompleto(nombreCompleto) {
-    const [rows] = await pool.query(
-        `SELECT * FROM usuario WHERE CONCAT(nombre, ' ', apellidos) = ?`,
-        [nombreCompleto]
     );
     return rows.length > 0 ? rows[0] : null;
 }
@@ -68,6 +72,9 @@ export async function deleteUser(id) {
     );
     return result.affectedRows > 0; // true si se eliminó
 }
+
+
+
 
 
 

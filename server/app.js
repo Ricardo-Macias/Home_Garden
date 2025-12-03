@@ -4,6 +4,9 @@ import {
     getGarden,
     getSensors,
     login,
+    insertUser,
+    findUserByCorreo,
+    getUserById
 } from "./database.js";
 import cors from 'cors';
 
@@ -21,6 +24,7 @@ app.use(cors(corsOptions));
  * USUARIO
  */
 
+// LOGIN
 app.post("/login", async (req, res) => {
     const { email, pass } = req.body;
 
@@ -41,19 +45,14 @@ app.post("/login", async (req, res) => {
     }
 });
 
-
-
-import { insertUser, findUserByCorreo, findUserByNombreCompleto } from "./database.js";
-
+// REGISTER
 app.post("/register", async (req, res) => {
     const { nombre, apellidos, correo, pass } = req.body;
 
-    // Validar campos vacíos
     if (!nombre || !apellidos || !correo || !pass) {
         return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    // Validar contraseña segura
     const passRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!passRegex.test(pass)) {
         return res.status(400).json({
@@ -62,16 +61,7 @@ app.post("/register", async (req, res) => {
     }
 
     try {
-        // valida el nombre completo duplicado
-        const nombreCompleto = `${nombre.trim()} ${apellidos.trim()}`;
-        const existingByName = await findUserByNombreCompleto(nombreCompleto);
-        if (existingByName) {
-            return res.status(400).json({
-                error: "Este nombre completo ya tiene una cuenta.",
-            });
-        }
-
-        // valida si el correo esta duplicado
+        // valida si el correo está duplicado
         const existingByCorreo = await findUserByCorreo(correo);
         if (existingByCorreo) {
             return res.status(400).json({
@@ -79,20 +69,18 @@ app.post("/register", async (req, res) => {
             });
         }
 
-        // inserta usuario
+        // inserta usuario (bcrypt.hash en database.js)
         const result = await insertUser(nombre, apellidos, correo, pass);
         res.status(201).json({ message: "Usuario creado correctamente", result });
-
     } catch (error) {
         console.error("Error al registrar usuario:", error);
         res.status(500).json({ error: "No se pudo registrar el usuario" });
     }
 });
 
-
-import { getUserById } from "./database.js";
-
+// GET USER BY ID
 app.get("/user/:id", async (req, res) => {
+    console.log("ID recibido:", req.params.id);
     try {
         const user = await getUserById(req.params.id);
         if (!user) {
