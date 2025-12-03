@@ -25,7 +25,10 @@ export default {
         permissions: [
             "android.permission.BLUETOOTH",
             "android.permission.BLUETOOTH_ADMIN",
-            "android.permission.BLUETOOTH_CONNECT"
+            "android.permission.BLUETOOTH_CONNECT",
+            "ACCESS_FINE_LOCATION",
+            "ACCESS_WIFI_STATE",
+            "CHANGE_WIFI_STATE"
         ],
         package: "com.appmodular.home_garden"
         },
