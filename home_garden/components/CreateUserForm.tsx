@@ -4,9 +4,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
     ActivityIndicator,
-    Alert,
 } from "react-native";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import Constants from "expo-constants";
@@ -65,14 +63,6 @@ export default function CreateUserForm(){
 
             const data = await response.json();
 
-            if (response.ok) {
-                setMessage( "Tu cuenta ha sido creada.");
-                setMessageType("success");
-                router.replace("/"); // vuelve al login
-            } else {
-                setMessage(data.error || "No se pudo registrar el usuario.");
-                setMessageType("error");
-            }
         } catch (err) {
             console.error("Error en registro:", err);
             setMessage("No se pudo conectar con el servidor.");
