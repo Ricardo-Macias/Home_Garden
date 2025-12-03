@@ -10,25 +10,6 @@ type Props = {
 };
 
 export default function ModalSensor({ isVisible, children, onClose }: Props){
-    const router = useRouter();
-    const sensors = [{
-            id: 1,
-            name: "sensor 1"
-        },{
-            id: 2,
-            name: "sensor 2"
-        },{
-            id: 3,
-            name: "sensor 3"
-        },{
-            id: 4,
-            name: "sensor 4"
-        }
-    ];
-
-    const handleSensor = () => {
-        router.push("/sensor/AddSensor");
-    };
 
     return (
         <Modal animationType="slide" transparent={true} visible={isVisible}>
