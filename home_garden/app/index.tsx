@@ -59,11 +59,7 @@ export default function Index(){
 
     // Login
     const handleLogin = async () => {
-        if (!email || !pass) {
-            setMessage("Campos requeridos, ingresa correo y contraseña.");
-            setMessageType("error");
-            return;
-        }
+        if (!validateLoginFields(email, pass)) return;
 
         setLoading(true);
         try {
@@ -76,18 +72,23 @@ export default function Index(){
             const data = await response.json();
 
             if (response.ok) {
-                // El backend devuelve {message, user}
-                const token = data.token || "token_de_prueba";
                 const userId = String(data.user.id);
 
-                // Guardar token e id en SecureStore
-                await SecureStore.setItemAsync("userToken", token);
+                // Guarda id en Redux y SecureStore
+                dispatch(setUserId(userId));
                 await SecureStore.setItemAsync("userId", userId);
 
-                // Guarda id en Redux
-                dispatch(setUserId(userId));
+                // Guarda token (si tu backend lo devuelve)
+                const token = data.token || "token_de_prueba";
+                await SecureStore.setItemAsync("userToken", token);
+
                 setMessage(`Bienvenido ${data.user.nombre || "usuario"}`);
                 setMessageType("success");
+
+                // Limpia campos
+                setEmail("");
+                setPass("");
+
                 router.replace("/(tabs)/home");
             } else {
                 setMessage(data.error || "Credenciales inválidas");
@@ -100,6 +101,7 @@ export default function Index(){
             setLoading(false);
         }
     };
+
 
 
     return (
