@@ -1,10 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, Button, FlatList } from "react-native";
+import { useRouter } from "expo-router";
+import { View, Button, FlatList } from "react-native";
 import { BleManager } from "react-native-ble-plx";
 
-export default function ScanDevicesBluetooth() {
+export default function ScanDevicesBluetooth( {} ) {
     const manager = new BleManager();
+    const router = useRouter();
     const [devices, setDevices] = useState<any[]>([]);
+    const [connectedDevice, setConnectedDevice] = useState<any>(null);
+
+    const handleConnect = () => {
+        router.push({
+            pathname: "/sensor/ConnectWifi",
+            params: {
+                deviceId: connectedDevice.id ,
+            },
+        });
+    }
 
     const scanForDevices = () => {
         console.log("Escaneando ...")
@@ -32,16 +44,19 @@ export default function ScanDevicesBluetooth() {
         }, 5000);
     };
 
-    const connectToDevice = (device: any) => {
-        console.log("Conectando a: ", device.name);
+    const connectToDevice = async (device: any) => {
+        try {
+            const connected = await device.connect();
+            await connected.discoverAllServicesAndCharacteristics();
 
-        device.connect()
-            .then((d: any) => {
-                console.log("Conectado : ", d.id);
-            })
-            .catch((err: any) => {
-                console.log("Error al conectar ", err);
-            });
+            console.log("Conectado a: ", connected.name);
+            setConnectedDevice(connected);
+
+            manager.stopDeviceScan();
+            handleConnect();
+        } catch (err) {
+            console.log("Error al conectar: ", err);
+        }
     };
 
     return (
