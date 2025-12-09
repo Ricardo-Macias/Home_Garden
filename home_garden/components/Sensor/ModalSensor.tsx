@@ -1,15 +1,30 @@
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { 
+    Modal, 
+    View, 
+    Text, 
+    Button,
+    StyleSheet, 
+    TouchableOpacity, 
+    ListRenderItemInfo,
+    FlatList,
+ } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import ScanDevicesBluetooth from "../Bluetooth/ScanDevices";
+import { Device } from "react-native-ble-plx";
 
 type Props = {
+    items: Device[];
     isVisible: boolean;
     children: React.ReactNode;
+    connectedToPeripheral: (device: Device) => void;
     onClose: () => void;
 };
 
-export default function ModalSensor({ isVisible, children, onClose }: Props){
+export default function ModalSensor({ items, isVisible, children, connectedToPeripheral, onClose }: Props){
+
+    const connectAndClosedModal = async (device: Device) => {
+        connectedToPeripheral(device);
+        onClose();
+    }
 
     return (
         <Modal animationType="slide" transparent={true} visible={isVisible}>
@@ -24,7 +39,16 @@ export default function ModalSensor({ isVisible, children, onClose }: Props){
                 </View>
                 {children}
                 <View style={styles.sensorsContainer}>
-                    <ScanDevicesBluetooth />
+                    <FlatList 
+                    data={items}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({item}) => (
+                        <Button 
+                            title={`Conectar a ${item.name}`}
+                            onPress={() => connectAndClosedModal(item)}
+                        />
+                    )}
+                    />
                 </View>
             </View>
         </Modal>
