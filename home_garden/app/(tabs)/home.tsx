@@ -1,7 +1,10 @@
-import { Text, View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
-import ButtonAddSensor from "../../components/Sensor/buttonSensor"
+import ModalSensor from "@/components/Sensor/ModalSensor";
 import Constants from "expo-constants";
+import { MaterialIcons } from "@expo/vector-icons";
+import BluetoothLeManager from "@/components/Bluetooth/BluetoothLeManager";
 
 interface AppConfig {
     API_URL: string;
@@ -9,8 +12,34 @@ interface AppConfig {
 const config = Constants.expoConfig?.extra as AppConfig;
 
 export default function Home() {
-
+    const [modalVisible, setModalVisible] = useState(false);
     const [users, setUser] = useState([]);
+
+
+    const {
+        requestPermissions,
+        scanForPeripherals,
+        connectToDevice,
+        connectedDevice,
+        allDevices,
+    } = BluetoothLeManager();
+    
+
+    const scanForDevices = async () => {
+        const isPermissionsEnable = await requestPermissions();
+        if (isPermissionsEnable){
+            scanForPeripherals();
+        }
+    }
+
+    const onModalClose = () => {
+        setModalVisible(false);
+    };
+
+    const onModalOpen = async () => {
+        scanForDevices();
+        setModalVisible(true);
+    }
 
     useEffect(() => {
         fetchData();
@@ -24,17 +53,42 @@ export default function Home() {
     };
 
     return (
-        <View style={styles.container}>
-            <Text> Bienvenido </Text>
-            <Text>{ JSON.stringify(users) }</Text>
-            <ButtonAddSensor />
-        </View>
+        <SafeAreaView style={styles.container}>
+            <View >
+                <Text> Bienvenido </Text>
+                <Text>{ JSON.stringify(users) }</Text>
+            </View>
+            <View style={styles.buttonAdd}>
+                <TouchableOpacity onPress={onModalOpen}>
+                    <MaterialIcons name="add" size={28} color="#f9f9f9"/>
+                </TouchableOpacity>
+                <ModalSensor
+                    items={allDevices}
+                    isVisible={modalVisible}
+                    connectedToPeripheral={connectToDevice}
+                    onClose={onModalClose}>
+                    <></>
+                </ModalSensor>
+            </View>
+        </SafeAreaView>
     );
 }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
+        position: "relative"
     },
+    buttonAdd: {
+        backgroundColor: "#6A1B9A",
+        position: "absolute",
+        bottom: 5,
+        right: 15,
+        borderRadius: 10,
+        width: 60,
+        height: 60,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+    }
 
 });
