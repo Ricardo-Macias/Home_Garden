@@ -16,14 +16,16 @@ type Props = {
     isVisible: boolean;
     children: React.ReactNode;
     connectedToPeripheral: (device: Device) => void;
+    goToConnectedWifi: () => void;
     onClose: () => void;
 };
 
-export default function ModalSensor({ items, isVisible, children, connectedToPeripheral, onClose }: Props){
+export default function ModalSensor({ items, isVisible, children, connectedToPeripheral, goToConnectedWifi, onClose }: Props){
 
     const connectAndClosedModal = async (device: Device) => {
         connectedToPeripheral(device);
         onClose();
+        goToConnectedWifi();
     }
 
     return (
