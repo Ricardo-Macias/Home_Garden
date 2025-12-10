@@ -30,6 +30,11 @@ export default function ModalConnectWifi({ssid, setSsid, password, setPassword,i
         });
     }, []);
 
+    const onModalClose = () => {
+        setPassword("");
+        onClose();
+    }
+
     return (
         <Modal animationType="slide" transparent={true} visible={isVisible}>
             <View style={styles.modalContent}>
@@ -37,7 +42,7 @@ export default function ModalConnectWifi({ssid, setSsid, password, setPassword,i
                     <Text>
                         Conectar a WIFI
                     </Text>
-                    <TouchableOpacity onPress={onClose}>
+                    <TouchableOpacity onPress={onModalClose}>
                         <MaterialIcons name="close" color="#fff" size={22}/>
                     </TouchableOpacity>
                 </View>
