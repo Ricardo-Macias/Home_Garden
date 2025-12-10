@@ -45,10 +45,13 @@ export default function ModalSensor({ items, isVisible, children, connectedToPer
                     data={items}
                     keyExtractor={(item) => item.id}
                     renderItem={({item}) => (
-                        <Button 
-                            title={`Conectar a ${item.name}`}
-                            onPress={() => connectAndClosedModal(item)}
-                        />
+                        <View style={styles.sensorsItem}>
+                            <TouchableOpacity
+                                style={{width: "100%",height: "100%" ,backgroundColor: "#6A1B9A", borderRadius: 5, justifyContent: "center", alignItems: "center"}}
+                                onPress={() => connectAndClosedModal(item)}>
+                                    <Text style={styles.sensorItemText}> { item.name } </Text>
+                            </TouchableOpacity>
+                        </View>
                     )}
                     />
                 </View>
@@ -61,7 +64,7 @@ const styles = StyleSheet.create({
     modalContent: {
         height: "45%",
         width: "100%",
-        backgroundColor: "#1B3F31",
+        backgroundColor: "#FFF",
         borderTopRightRadius: 18,
         borderTopLeftRadius: 18,
         position: "absolute",
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         height: "10%",
-        backgroundColor: "#367D62",
+        backgroundColor: "#6A1B9A",
         borderTopRightRadius: 10,
         borderTopLeftRadius: 10,
         paddingHorizontal: 20,
@@ -85,20 +88,17 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: "center",
+        padding: 10,
     },
     sensorsItem: {
-        backgroundColor: "blue",
-        padding: 5,
-        margin: 5,
-        height: "20%",
+    
+        height: 50,
         width: "45%",
-    },
+        },
     sensorItemText: {
-        fontSize: 25,
+        fontSize: 16,
         color: "#fff",
-        textAlign: "center",
-        textAlignVertical: "center",
+        
     }
 
 })
