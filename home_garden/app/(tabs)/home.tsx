@@ -1,6 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
+import { Router, useRouter } from "expo-router";
 import ModalSensor from "@/components/Sensor/ModalSensor";
 import ModalConnectWifi from "@/components/Sensor/ModalConnectWifi";
 import Constants from "expo-constants";
@@ -13,6 +14,7 @@ interface AppConfig {
 const config = Constants.expoConfig?.extra as AppConfig;
 
 export default function Home() {
+    const router = useRouter();
     const [modalBluetoothVisible, setModalBluetoothVisible] = useState(false);
     const [modalWifiVisible, setModalWifiVisible] = useState(false);
 
@@ -64,6 +66,9 @@ export default function Home() {
     useEffect(() => {
         if (!modalWifiVisible && password != "" && ssid != ""){
             sendCredentials(ssid,password);
+            router.push("/sensor/AddSensor");
+            //setSsid("");
+            //setPassword("");
         }
     }, [modalWifiVisible])
     
@@ -84,16 +89,16 @@ export default function Home() {
                 <TouchableOpacity onPress={onModalOpen}>
                     <MaterialIcons name="add" size={28} color="#f9f9f9"/>
                 </TouchableOpacity>
-                <ModalSensor
+                { modalBluetoothVisible && (<ModalSensor
                     items={allDevices}
                     isVisible={modalBluetoothVisible}
                     connectedToPeripheral={connectToDevice}
                     goToConnectedWifi={goToConnectedWifi}
                     onClose={onModalClose}>
                     <></>
-                </ModalSensor>
+                </ModalSensor>)}
 
-                <ModalConnectWifi
+                { modalWifiVisible && (<ModalConnectWifi
                     ssid={ssid}
                     setSsid={setSsid}
                     password={password}
@@ -101,7 +106,7 @@ export default function Home() {
                     isVisible={modalWifiVisible}
                     onClose={onModalWifiClose}>
                     <></>
-                </ModalConnectWifi>
+                </ModalConnectWifi> )}
             </View>
         </SafeAreaView>
     );
