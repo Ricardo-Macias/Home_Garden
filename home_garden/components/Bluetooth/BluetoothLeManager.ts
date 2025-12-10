@@ -11,8 +11,9 @@ import * as expoDevice from "expo-device";
 
 //import base64 from "react-native-base64"
 
-const HEART_RATE_UUID = "0000180d-0000-1000-8000-00805f9b34fb";
-const HEART_RATE_CHARACTERISTIC = "00002a37-0000-1000-8000-00805f9b34fb";
+const SERVICE_UUID = "79f0dfb3-5f08-4502-8ff0-5a9b2396aab1";
+const SSID_CHAR_UUID = "d24233d0-b34d-4bbe-8f2a-f661530c6217";
+const PASS_CHAR_UUID = "ef1c20a3-26b6-4aab-88dc-e377f105e8f4";
 
 
 interface BluetoothLowEnergyApi {
@@ -20,9 +21,9 @@ interface BluetoothLowEnergyApi {
     scanForPeripherals(): void;
     connectToDevice: (deviceId: Device) => Promise<void>;
     disconnectFromDevice: () => void;
+    sendCredentials: (ssid: string, pass: string) => Promise<void>;
     connectedDevice: Device | null;
     allDevices: Device[];
-    heartRate: number; 
 }
 
 function BluetoothLeManager(): BluetoothLowEnergyApi{
@@ -113,7 +114,6 @@ function BluetoothLeManager(): BluetoothLowEnergyApi{
             setConnectedDevice(deviceConnection);
             await deviceConnection.discoverAllServicesAndCharacteristics();
             bleManager.stopDeviceScan();
-            //startStreamData();
         } catch (err) {
             console.log("FAILED TO CONNECT", err);
         }
@@ -127,44 +127,23 @@ function BluetoothLeManager(): BluetoothLowEnergyApi{
         }
     };
 
-    /*const onHearRateUpdate = (
-        error: BleError | null,
-        characteristic: Characteristic | null
-    ) => {
-        if (error) {
-            console.log(error);
-            return -1;
-        } else if (!characteristic?.value){
-            console.log("No data was recieved");
-            return -1;
-        }
-
-        const rawData = base64.decode(characteristic.value);
-        let innerHeartRate: number = -1;
-
-
-        const firstBitValue: number = Number(rawData) & 0x01;
-
-        if (firstBitValue === 0) {
-            innerHeartRate = rawData[1].charCodeAt(0);
-        } else {
-            innerHeartRate = Number(rawData[1].charCodeAt(0) << 8) + Number(rawData[2].charCodeAt(2));
-        }
-
-        setHeartRate(innerHeartRate);
-    };
-
-    const startStreamData = async (device: Device) => {
-        if (device) {
-            device.monitorCharacteristicForService(
-                HEART_RATE_UUID,
-                HEART_RATE_CHARACTERISTIC,
-                onHearRateUpdate
+    const sendCredentials = async (ssid: string, pass: string) => {
+        try {
+            await connectedDevice?.writeCharacteristicWithResponseForService(
+                SERVICE_UUID,
+                SSID_CHAR_UUID,
+                Buffer.from(ssid).toString("base64")
             );
-        } else {
-            console.log("No device Connected");
+
+            await connectedDevice?.writeCharacteristicWithResponseForService(
+                SERVICE_UUID,
+                PASS_CHAR_UUID,
+                Buffer.from(pass).toString("base64")
+            );
+        } catch (err) {
+            console.log("Error enviando datos: ", err);
         }
-    };*/
+    }
 
     return {
         requestPermissions,
@@ -173,7 +152,7 @@ function BluetoothLeManager(): BluetoothLowEnergyApi{
         allDevices,
         connectedDevice,
         disconnectFromDevice,
-        heartRate
+        sendCredentials,
     }
 }
 
