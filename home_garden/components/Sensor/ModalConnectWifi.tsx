@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import {
     Modal,
@@ -11,14 +11,16 @@ import {
 import NetInfo from "@react-native-community/netinfo";
 
 type Props = {
+    ssid: string;
+    setSsid: React.Dispatch<React.SetStateAction<string>>;
+    password: string;
+    setPassword: React.Dispatch<React.SetStateAction<string>>;
     isVisible: boolean;
     children: React.ReactNode;
     onClose: () => void;
 }
 
-export default function ModalConnectWifi({isVisible, children, onClose}: Props){
-    const [ssid, setSsid] = useState("");
-    const [password, setPassword] = useState<string>("");
+export default function ModalConnectWifi({ssid, setSsid, password, setPassword,isVisible, children, onClose}: Props){
     const [showPassword, setShowPassword] = useState(false)
 
     useEffect(() => {
@@ -46,6 +48,7 @@ export default function ModalConnectWifi({isVisible, children, onClose}: Props){
                         <FontAwesome name="wifi" size={20} color="#6A109A" style={styles.icon}/>
                         <TextInput
                             value={ssid}
+                            onChangeText={setSsid}
                             editable={false}
                             style={styles.TextInput}
                             placeholder="Nombre de la red"></TextInput>
@@ -71,7 +74,7 @@ export default function ModalConnectWifi({isVisible, children, onClose}: Props){
                             />
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.Button} onPress={() => {}}>
+                    <TouchableOpacity style={styles.Button} onPress={onClose}>
                         <Text style={styles.textButton}>Conectar</Text>
                     </TouchableOpacity>
                 </View>

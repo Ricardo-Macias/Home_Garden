@@ -16,6 +16,9 @@ export default function Home() {
     const [modalBluetoothVisible, setModalBluetoothVisible] = useState(false);
     const [modalWifiVisible, setModalWifiVisible] = useState(false);
 
+    const [ssid, setSsid] = useState("");
+    const [password, setPassword] = useState<string>("");
+
     const [users, setUser] = useState([]);
 
 
@@ -25,6 +28,7 @@ export default function Home() {
         connectToDevice,
         connectedDevice,
         allDevices,
+        sendCredentials,
     } = BluetoothLeManager();
     
 
@@ -56,6 +60,12 @@ export default function Home() {
     useEffect(() => {
         fetchData();
     }, [])
+
+    useEffect(() => {
+        if (!modalWifiVisible && password != "" && ssid != ""){
+            sendCredentials(ssid,password);
+        }
+    }, [modalWifiVisible])
     
     async function fetchData() {
         const response = await fetch(`${config.API_URL}/sensor/1`);
@@ -84,6 +94,10 @@ export default function Home() {
                 </ModalSensor>
 
                 <ModalConnectWifi
+                    ssid={ssid}
+                    setSsid={setSsid}
+                    password={password}
+                    setPassword={setPassword}
                     isVisible={modalWifiVisible}
                     onClose={onModalWifiClose}>
                     <></>
