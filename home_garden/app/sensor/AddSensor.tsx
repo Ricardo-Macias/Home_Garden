@@ -1,3 +1,4 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter, useNavigation } from "expo-router";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
@@ -53,7 +54,7 @@ export default function FormSensor(){
     }
     
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
 
             <View style={styles.ImageContainer}>
                 <ImageViewer 
@@ -61,16 +62,19 @@ export default function FormSensor(){
                     sizeWidth={300}
                     sizeHeight={200}
                 />
+                <Button label="" theme="primary" />
             </View>
 
-            <Text style={styles.Label}>Nombre</Text>
-            <TextInput 
-                onChangeText={onChangeText} 
-                style={styles.TextInput} 
-                placeholder="Nombre del sensor">
-            </TextInput>
+            <Text style={styles.text}>Nombre</Text>
+            <View style={styles.InputContainer}>
+                <TextInput 
+                    onChangeText={onChangeText} 
+                    style={styles.TextInput} 
+                    placeholder="Nombre del sensor">
+                </TextInput>
+            </View>
 
-            <Text style={styles.Label}>Cultivo</Text>
+            <Text style={styles.text}>Cultivo</Text>
             <View style={styles.DropDownPickerContainer}>
                 <DropDownPicker 
                     open={open}
@@ -83,49 +87,72 @@ export default function FormSensor(){
                     />
             </View>
 
-            <View style={{margin: 10}}>
-                <Button label="Tomar foto" theme="primary" />
-            </View>
-
             <TouchableOpacity onPress={handleHome} style={styles.Button}>
-                <Text>Registrar sensor</Text>
+                <Text style={styles.textButton}>Registrar sensor</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#fff",
+        paddingHorizontal: 20,
         alignItems: "center",
     },
     ImageContainer: {
-        marginTop: 15,
+        flexDirection: "column",
+        alignItems: "center",
+   
+        marginBottom: 16,
+        width: "100%",
+        backgroundColor: "#FFF",
     },
     DropDownPickerContainer: {
-        width: "90%",
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 10,
+        marginBottom: 16,
+        width: "100%",
+        backgroundColor: "#F9F9F9",
+    },
+    InputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        marginBottom: 16,
+        width: "100%",
+        backgroundColor: "#F9F9F9",
     },
     TextInput: {
-        width: "90%",
+        flex: 1,
         height: 48,
-        backgroundColor: "#fff",
         fontSize: 16,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: "#000",
+        color: "#333",
     },
     Button: {
-        width: "90%",
-        height: 40,
-        margin: 10,
+        backgroundColor: "#641B9A",
         borderRadius: 10,
-        backgroundColor: "#6a1b9a",
-        justifyContent: "center",
+        paddingVertical: 14,
+        width: "100%",
         alignItems: "center",
+        bottom: 30, 
+        marginTop: 50,
     },
-    Label: {
+    textButton: {
+        color: "#fff",
         fontSize: 16,
-        margin: 10,
-        color: "#000",
+        fontWeight: "bold",
+    },
+    text: {
+        fontSize: 16,
+        color: "#333",
+        marginBottom: 15,
     }
 });
