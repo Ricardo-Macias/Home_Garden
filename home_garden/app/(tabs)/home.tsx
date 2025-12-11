@@ -67,8 +67,6 @@ export default function Home() {
         if (!modalWifiVisible && password != "" && ssid != ""){
             sendCredentials(ssid,password);
             router.push("/sensor/AddSensor");
-            //setSsid("");
-            //setPassword("");
         }
     }, [modalWifiVisible])
     
