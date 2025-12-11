@@ -11,7 +11,7 @@ export default function Button({ label, theme}: Props){
         return (
             <View
                 style={[
-                    styles.buttonContainer,{borderWidth: 4, borderColor: "#6a1b9a", borderRadius: 10 }
+                    styles.buttonContainer,{borderWidth: 1, borderColor: "#6a1b9a", borderRadius: 5 }
                 ]}
             >
                 <Pressable
@@ -19,10 +19,9 @@ export default function Button({ label, theme}: Props){
                     onPress={() => alert("You pressed a button.")}
                 >
                     <FontAwesome
-                    name="picture-o"
+                    name="camera"
                     size={18}
                     color="#25292e"
-                    style={styles.buttonIcon}
                     />
                     <Text style={styles.buttonLabel}>{label}</Text>
                 </Pressable>
@@ -34,12 +33,14 @@ export default function Button({ label, theme}: Props){
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        width: 320,
-        height: 68,
-        marginHorizontal: 20,
+        position: "absolute",
+        bottom: 5,
+        right: 0,
+        width: "15%",
+        height: "15%",
         alignItems: "center",
         justifyContent: "center",
-        padding: 2,
+        flexDirection: "row",
     },
     button: {
         borderRadius: 10,
@@ -48,9 +49,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
-    },
-    buttonIcon: {
-        paddingRight: 8,
     },
     buttonLabel: {
         color: "#000",
