@@ -31,7 +31,7 @@ export async function insertUser(name, lastName, email, pass) {
 }
 
 // LOGIN: compara contraseña ingresada con hash guardado
-export async function login(email, pass) {
+export async function findUserForLogin(email, pass) { 
     const [rows] = await pool.query(
         `SELECT * FROM usuario WHERE correo = ?`,
         [email]
@@ -42,7 +42,7 @@ export async function login(email, pass) {
     // Compara contraseña ingresada con la cifrada
     const match = await bcrypt.compare(pass, rows[0].pass);
 
-    return match ? rows[0] : false;
+    return match ? { id: rows[0].id, nombre: rows[0].nombre, correo: rows[0].correo } : false;
 }
 
 
@@ -72,9 +72,6 @@ export async function deleteUser(id) {
     );
     return result.affectedRows > 0; // true si se eliminó
 }
-
-
-
 
 
 
