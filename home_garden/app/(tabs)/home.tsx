@@ -1,7 +1,9 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Button } from "react-native";
 import { useEffect, useState } from "react";
 import ButtonAddSensor from "../../components/Sensor/buttonSensor"
 import Constants from "expo-constants";
+import { useRouter } from "expo-router";
+import { useSelector } from "react-redux";
 
 interface AppConfig {
     API_URL: string;
@@ -9,32 +11,54 @@ interface AppConfig {
 const config = Constants.expoConfig?.extra as AppConfig;
 
 export default function Home() {
+    const userId = useSelector((state: any) => state.user.id); 
+    const [userData, setUserData] = useState<any>(null);
+    const router = useRouter();
 
-    const [users, setUser] = useState([]);
 
     useEffect(() => {
-        fetchData();
-    }, [])
-    
-    async function fetchData() {
-        const response = await fetch(`${config.API_URL}/sensor/1`);
-        const data = await response.json();
+        if(userId){
+            fetchUserData();
+        }
+    }, [userId]);
 
-        setUser(data);
+    async function fetchUserData() {
+        try {
+            const response = await fetch(`${config.API_URL}/user/${userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setUserData(data);
+            } else {
+                setUserData(null);
+            }
+        } catch (err) {
+            console.error("Error al obtener usuario:", err);
+        }
+    }
+
+    const handleLogout = () => {
+        router.replace("/"); // vuelve al login
     };
 
     return (
         <View style={styles.container}>
-            <Text> Bienvenido </Text>
-            <Text>{ JSON.stringify(users) }</Text>
-            <ButtonAddSensor />
+            <Text style={styles.title}>
+                Bienvenido {userData ? userData.nombre : "usuario"}
+            </Text>
+            <Button title="Cerrar sesión" onPress={handleLogout} />
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
+        padding: 20,
     },
-
+    title: {
+        fontSize: 20,
+        marginBottom: 10,
+        fontWeight: "bold",
+    },
 });
