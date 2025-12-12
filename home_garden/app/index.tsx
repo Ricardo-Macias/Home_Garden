@@ -1,127 +1,122 @@
-import React, { useState, useEffect } from "react";
-import { Alert, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from "react-native";
 import Constants from "expo-constants";
 import LoginForm from "../components/LoginForm";
 import CreateUserForm from "../components/CreateUserForm";
-import { useRouter } from "expo-router";
+import { useRouter, useRootNavigationState } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
 import * as SecureStore from "expo-secure-store";
-import { useDispatch } from "react-redux";
-import { setUserId } from "../store/slices/userSlice";
-import MessageBox from "../components/MessageBox";
+import {
+    loginUser,
+    refreshToken,
+    registerUser,
+    clearError,
+} from "../Redux/authSlice";
+import { RootState, AppDispatch } from "../Redux/store";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-
-const config = Constants.expoConfig?.extra || { API_URL: ""};
-
-export default function Index(){
-    const [email, setEmail] = useState("");
-    const [pass, setPass] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [showSignup, setShowSignup] = useState(false);
+export default function Index() {
     const router = useRouter();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
+    const navigationState = useRootNavigationState();
 
-    const [message, setMessage] = useState<string | null>(null); 
-    const [messageType, setMessageType] = useState<"error" | "success" | "info">("info");
+    const { user, accessToken, status, errorMessage } = useSelector(
+        (state: RootState) => state.auth
+    );
 
-    // Restaurar sesion si existe
+    const [showSignup, setShowSignup] = useState(false);
+
+    // Estado nuevo: evita mostrar login antes de saber si hay token
+    const [checkingSession, setCheckingSession] = useState(true);
+
+    const [loginMessage, setLoginMessage] = useState<string | null>(null);
+
     useEffect(() => {
-        const checkStoredSession = async () => {
+        const checkToken = async () => {
             try {
-                const token = await SecureStore.getItemAsync("userToken");
-                const userId = await SecureStore.getItemAsync("userId");
-                if (token && userId) {
-                    console.log("Sesión encontrada:", { token, userId });
-                    dispatch(setUserId(userId));
-                    router.replace("/(tabs)/home");
+                const refresh = await SecureStore.getItemAsync("refreshToken");
+
+                if (refresh) {
+                    await dispatch(refreshToken());
                 }
             } catch (err) {
-                console.error("Error al leer sesión:", err);
+                console.log("Error leyendo token:", err);
             }
+
+            // Termino de revision del token
+            setCheckingSession(false);
         };
-        checkStoredSession();
+
+        checkToken();
     }, []);
 
-    // Validación rápida de campos
-    const validateLoginFields = (email: string, pass: string) => {
-        if (!email || !pass) {
-            setMessage("Campos requeridos, ingresa correo y contraseña.");
-            setMessageType("error");
-            return false;
+    // Si ya hay usuario y token entra directamente a home
+    useEffect(() => {
+        if (!checkingSession && navigationState && accessToken && user) {
+            router.replace("/(tabs)/home");
         }
-        return true;
-    };
+    }, [checkingSession, navigationState, accessToken, user]);
 
-    // Manejo uniforme de errores
-    const showError = (message: string) => {
-        setMessage(message);
-        setMessageType("error")
-    };
-
-    // Login
-    const handleLogin = async () => {
-        if (!validateLoginFields(email, pass)) return;
-
-        setLoading(true);
-        try {
-            const response = await fetch(`${config.API_URL}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, pass }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const userId = String(data.user.id);
-
-                // Guarda id en Redux y SecureStore
-                dispatch(setUserId(userId));
-                await SecureStore.setItemAsync("userId", userId);
-
-                // Guarda token (si tu backend lo devuelve)
-                const token = data.token || "token_de_prueba";
-                await SecureStore.setItemAsync("userToken", token);
-
-                setMessage(`Bienvenido ${data.user.nombre || "usuario"}`);
-                setMessageType("success");
-
-                // Limpia campos
-                setEmail("");
-                setPass("");
-
-                router.replace("/(tabs)/home");
-            } else {
-                setMessage(data.error || "Credenciales inválidas");
-                setMessageType("error");
-            }
-        } catch (err) {
-            setMessage("No se pudo conectar con el servidor.");
-            setMessageType("error");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
+    // Mientras se revisa sesión, monstrara loader
+    if (checkingSession) {
+        return (
+            <SafeAreaProvider style={{ flex: 1, backgroundColor: "#fff", justifyContent:"center", alignItems:"center" }}>
+                <ActivityIndicator size="large" />
+            </SafeAreaProvider>
+        );
+    }
 
     return (
-        <View style={{ flex: 1}}>
-            {showSignup ? (
-                <CreateUserForm />
-            ) : (
-                <LoginForm
-                    email={email}
-                    pass={pass}
-                    onEmailChange={setEmail}
-                    onPassChange={setPass}
-                    onSubmit={handleLogin}
-                    loading={loading}
-                    onSignupPress={() => setShowSignup(true)}
-                    message={message}
-                    messageType={messageType}     
-                    onCloseMessage={() => setMessage(null)} 
-                />
-            )}
-        </View>
+        <SafeAreaProvider style={{ flex: 1, backgroundColor: "#fff" }}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={{ flex: 1, backgroundColor: "#fff", padding: 5 }}>
+                        {showSignup ? (
+                            <CreateUserForm
+                                onSubmit={(nombre, apellidos, email, pass) => {
+                                    dispatch(registerUser({ nombre, apellidos, email, pass }))
+                                        .unwrap()
+                                        .then(() => {
+                                            setShowSignup(false);
+                                            setLoginMessage("Registro exitoso. Ahora ingresa tus credenciales.");
+                                            dispatch(clearError());
+                                        });
+                                }}
+                                loading={status === "loading"}
+                                onCancel={() => setShowSignup(false)}
+                                message={errorMessage}
+                                messageType={errorMessage ? "error" : "info"}
+                                onCloseMessage={() => dispatch(clearError())}
+                            />
+                        ) : (
+                            <LoginForm
+                                onSubmit={(email, pass) => {
+                                    dispatch(loginUser({ email, pass }));
+                                }}
+                                loading={status === "loading"}
+                                onSignupPress={() => {
+                                    setShowSignup(true);
+                                    setLoginMessage(null);
+                                }}
+                                message={loginMessage || errorMessage}
+                                messageType={
+                                    loginMessage ? "success" : errorMessage ? "error" : "info"
+                                }
+                                onCloseMessage={() => {
+                                    setLoginMessage(null);
+                                    dispatch(clearError());
+                                }}
+                            />
+                        )}
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaProvider>
     );
 }
