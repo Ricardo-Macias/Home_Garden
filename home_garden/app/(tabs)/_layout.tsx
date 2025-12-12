@@ -31,6 +31,7 @@ export default function TabsLayout() {
             } } />
             <Tabs.Screen name="perfile" options={{
                 tabBarLabel: "Perfil",
+                headerShown: false,
                 tabBarIcon: ({ focused, color }) => <Ionicons
                     name={focused ? "person-circle" : "person-circle-outline"}
                     color={color}
