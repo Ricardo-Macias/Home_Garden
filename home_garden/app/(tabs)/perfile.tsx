@@ -2,25 +2,25 @@ import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, ActivityIndicator, Button } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import Constants from "expo-constants";
-import { clearUserId } from "../../store/slices/userSlice";
-import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
+import { RootState, AppDispatch } from "../../Redux/store";
+import { logoutUser } from "../../Redux/authSlice";
 
 const config = Constants.expoConfig?.extra || { API_URL: "" };
 
 export default function Perfil() {
-    const userId = useSelector((state: any) => state.user.id);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
+    const user = useSelector((state: RootState) => state.auth.user);
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
-            if (!userId) return;
+            if (!user?.id) return;
             setLoading(true);
             try {
-                const response = await fetch(`${config.API_URL}/user/${userId}`);
+                const response = await fetch(`${config.API_URL}/user/${user.id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setUserData(data);
@@ -34,15 +34,12 @@ export default function Perfil() {
             }
         };
         fetchUserData();
-    }, [userId]);
-
+    }, [user]);
 
     const handleLogout = async () => {
-        dispatch(clearUserId());
-        await SecureStore.deleteItemAsync("userId");
-        router.replace("/"); 
+        await dispatch(logoutUser());
+        router.replace("/");
     };
-
 
     if (loading) {
         return <ActivityIndicator size="large" color="#6A1B9A" />;
@@ -53,13 +50,13 @@ export default function Perfil() {
             <Text style={styles.title}>Perfil</Text>
             {userData ? (
                 <>
-                <Text>Nombre: {userData.nombre}</Text>
-                <Text>Apellidos: {userData.apellidos}</Text>
-                <Text>Correo: {userData.correo}</Text>
-                <Text>ID: {userId}</Text>
+                    <Text>Nombre: {userData.nombre}</Text>
+                    <Text>Apellidos: {userData.apellidos}</Text>
+                    <Text>Correo: {userData.correo}</Text>
+                    <Text>ID: {user?.id}</Text>
                 </>
             ) : (
-            <Text>No se encontraron datos del usuario</Text>
+                <Text>No se encontraron datos del usuario</Text>
             )}
             <Button title="Cerrar sesión" onPress={handleLogout} color="#6A1B9A" />
         </View>
