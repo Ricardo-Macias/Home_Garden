@@ -1,13 +1,19 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { StyleSheet, View, Pressable, Text } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, View, Pressable, Text, TouchableOpacity } from "react-native";
+
+type FontAwesomeIconName = 
+    React.ComponentProps<typeof FontAwesome>["name"];
 
 type Props = {
     label: string;
-    theme?: "primary";
+    icon: FontAwesomeIconName;
+    theme?: "primary" | "camera";
     onPress: () => void;
 };
 
-export default function Button({ label, theme, onPress}: Props){
+export default function Button({ label, icon, theme, onPress}: Props){
     if (theme === "primary") {
         return (
             <View
@@ -20,15 +26,26 @@ export default function Button({ label, theme, onPress}: Props){
                     onPress={onPress}
                 >
                     <FontAwesome
-                    name="camera"
+                    name={icon}
                     size={18}
                     color="#25292e"
                     />
-                    <Text style={styles.buttonLabel}>{label}</Text>
                 </Pressable>
 
             </View>
         );
+    };
+
+    if (theme === "camera") {
+        return (
+            <TouchableOpacity onPress={onPress} style={styles.buttonCamera}>
+                <FontAwesome 
+                    name={icon}
+                    size={28} 
+                    color="#f1f1f1" />
+                <Text style={styles.label}>{label}</Text>
+            </TouchableOpacity>
+        )
     };
 }
 
@@ -51,8 +68,16 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flexDirection: "row",
     },
-    buttonLabel: {
-        color: "#000",
+    buttonCamera: {
+        height: 40,
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    label: {
+        fontWeight: "bold",
         fontSize: 16,
+        color: "#f1f1f1",
+        marginLeft: 10,
     },
 })
