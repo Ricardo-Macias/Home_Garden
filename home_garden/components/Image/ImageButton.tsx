@@ -7,13 +7,14 @@ type FontAwesomeIconName =
     React.ComponentProps<typeof FontAwesome>["name"];
 
 type Props = {
+    color: string;
     label: string;
     icon: FontAwesomeIconName;
     theme?: "primary" | "camera";
     onPress: () => void;
 };
 
-export default function Button({ label, icon, theme, onPress}: Props){
+export default function Button({ color, label, icon, theme, onPress}: Props){
     if (theme === "primary") {
         return (
             <View
@@ -42,7 +43,7 @@ export default function Button({ label, icon, theme, onPress}: Props){
                 <FontAwesome 
                     name={icon}
                     size={28} 
-                    color="#f1f1f1" />
+                    color={color} />
                 <Text style={styles.label}>{label}</Text>
             </TouchableOpacity>
         )
