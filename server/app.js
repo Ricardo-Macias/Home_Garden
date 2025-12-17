@@ -6,6 +6,8 @@ import {
     login,
 } from "./database.js";
 import cors from 'cors';
+import multer from "multer";
+import path from "path";
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -16,6 +18,16 @@ const corsOptions = {
 const app = express();
 app.use(express.json());
 app.use(cors(corsOptions));
+
+const storage = multer.diskStorage({
+    destination: "uploads/",
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname) || ".jpg";
+        cb(null, `${Date.now()}${ext}`);
+    },
+})
+
+const upload = multer({ storage })
 
 /**
  * USUARIO
@@ -51,6 +63,17 @@ app.get("/garden/:id", async (req, res) => {
 app.get("/crop", async (req, res) => {
     const crop = await getAllCrop();
     res.status(200).send(crop);
+});
+
+/*
+    Subir Imagen
+*/
+
+app.post("/upload", upload.single("image"), (req, res) => {
+    res.json({
+        message: "Imagen subida correctamente",
+        file: req.file,
+    });
 });
 
 /*
