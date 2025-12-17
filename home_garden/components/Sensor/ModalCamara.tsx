@@ -1,10 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CameraType, FlashMode, CameraView } from "expo-camera";
 import Constants from "expo-constants";
 import {
     Modal,
     View,
-    Text,
+    BackHandler,
     StyleSheet,
     Image,
 } from "react-native";
@@ -62,8 +62,24 @@ export default function ModalCamara({isVisible, onClose}: Props){
         }
     }
 
+    useEffect(() => {
+        if (!isVisible) return;
+
+        const backAction = () => {
+            onClose();
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, [isVisible]);
+
     return (
-        <Modal animationType="slide" transparent={true} visible={isVisible} >
+        <Modal animationType="slide" transparent={true} visible={isVisible} onRequestClose={onClose}>
             <View style={styles.container}>
                 {!image ? 
                 <View style={{
@@ -72,7 +88,7 @@ export default function ModalCamara({isVisible, onClose}: Props){
                     <View style={{
                         flexDirection: "row",
                         justifyContent: "space-between",
-                        padding: 30,
+                        padding: 10,
                     }}>
                         <Button  
                             color="#f1f1f1" 
