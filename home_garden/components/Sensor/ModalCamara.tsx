@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { CameraType, FlashMode, CameraView } from "expo-camera";
-import * as MediaLibrary from "expo-media-library";
+import Constants from "expo-constants";
 import {
     Modal,
     View,
@@ -10,6 +10,10 @@ import {
 } from "react-native";
 import Button from "../Image/ImageButton";
 
+interface AppConfig {
+    API_URL: string;
+}
+const config = Constants.expoConfig?.extra as AppConfig;
 
 type Props = {
     isVisible: boolean;
@@ -21,13 +25,11 @@ export default function ModalCamara({isVisible, onClose}: Props){
     const [type, setType] = useState<CameraType>("back");
     const [flash, setFlash] = useState<FlashMode>("off");
     const cameraRef = useRef<CameraView>(null);
-    const formData = new FormData();
 
     const takePicture = async () => {
         if(cameraRef.current) {
             try {
                 const data = await cameraRef.current.takePictureAsync();
-                console.log(data);
                 setImage(data.uri);
             } catch(err) {
                 console.log(err);
@@ -36,12 +38,26 @@ export default function ModalCamara({isVisible, onClose}: Props){
     }
     
     const saveImage = async () => {
+        const formData = new FormData();
+
+        formData.append("image", {
+            uri: image,
+            name: "photo.jpg",
+            type: "image/jpeg",
+        } as any);
+
         if(image) {
             try{
-                await MediaLibrary.createAssetAsync(image);
+                console.log(image);
+                const response = await fetch(`${config.API_URL}/upload`,{
+                    method: "POST",
+                    body: formData,
+                });
+
                 setImage(null);
+                onClose();
             } catch(err){
-                console.log(err);
+                console.log("Error al subir imagen ",err);
             }
         }
     }
