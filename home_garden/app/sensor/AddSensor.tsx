@@ -1,10 +1,12 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState} from "react";
 import { useRouter, useNavigation } from "expo-router";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 import DropDownPicker from "react-native-dropdown-picker";
 import ImageViewer from "@/components/Image/ImageViewer";
 import Button from "@/components/Image/ImageButton";
+import ModalCamara from "@/components/Sensor/ModalCamara";
 import Constants from "expo-constants";
 
 interface AppConfig {
@@ -19,7 +21,7 @@ export default function FormSensor(){
     const [text, onChangeText] = React.useState('Useless Text');
     const router = useRouter();
     const navigation = useNavigation();
-
+    
     // Cambia el encabezado
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -27,6 +29,18 @@ export default function FormSensor(){
         });
     }, [navigation]);
     // ----------------------
+
+    const [modalCameraVisible, setModalCameraVisible] = useState(false);
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean>();
+
+    const openCamera = async () => {
+        MediaLibrary.requestPermissionsAsync();
+        const cameraStatus = await Camera.requestCameraPermissionsAsync();
+        setHasCameraPermission(cameraStatus.status === 'granted');
+        if (hasCameraPermission){
+            setModalCameraVisible(true);
+        }
+    }
 
     interface Crop {
         id: number;
@@ -54,7 +68,7 @@ export default function FormSensor(){
     }
     
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
 
             <View style={styles.ImageContainer}>
                 <ImageViewer 
@@ -62,7 +76,7 @@ export default function FormSensor(){
                     sizeWidth={300}
                     sizeHeight={200}
                 />
-                <Button label="" theme="primary" />
+                <Button color="" label="" icon="camera" theme="primary" onPress={openCamera} />
             </View>
 
             <Text style={styles.text}>Nombre</Text>
@@ -90,7 +104,12 @@ export default function FormSensor(){
             <TouchableOpacity onPress={handleHome} style={styles.Button}>
                 <Text style={styles.textButton}>Registrar sensor</Text>
             </TouchableOpacity>
-        </SafeAreaView>
+
+            { modalCameraVisible && (<ModalCamara
+                isVisible={modalCameraVisible}
+                onClose={() => setModalCameraVisible(false)}>
+            </ModalCamara>)}
+        </View>
     );
 }
 
