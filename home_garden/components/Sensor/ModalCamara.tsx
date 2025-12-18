@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { CameraType, FlashMode, CameraView } from "expo-camera";
 import Constants from "expo-constants";
 import {
@@ -16,12 +16,13 @@ interface AppConfig {
 const config = Constants.expoConfig?.extra as AppConfig;
 
 type Props = {
+    setImage: React.Dispatch<React.SetStateAction<string | null>>;
     isVisible: boolean;
     onClose: () => void;
 }
 
-export default function ModalCamara({isVisible, onClose}: Props){
-    const [image, setImage] = useState<string | null>(null);
+export default function ModalCamara({ setImage, isVisible, onClose}: Props){
+    const [url, setUrl] = useState<string | null>(null);
     const [type, setType] = useState<CameraType>("back");
     const [flash, setFlash] = useState<FlashMode>("off");
     const cameraRef = useRef<CameraView>(null);
@@ -30,7 +31,7 @@ export default function ModalCamara({isVisible, onClose}: Props){
         if(cameraRef.current) {
             try {
                 const data = await cameraRef.current.takePictureAsync();
-                setImage(data.uri);
+                setUrl(data.uri);
             } catch(err) {
                 console.log(err);
             }
@@ -41,20 +42,21 @@ export default function ModalCamara({isVisible, onClose}: Props){
         const formData = new FormData();
 
         formData.append("image", {
-            uri: image,
+            uri: url,
             name: "photo.jpg",
             type: "image/jpeg",
         } as any);
 
-        if(image) {
+        if(url) {
             try{
-                console.log(image);
                 const response = await fetch(`${config.API_URL}/upload`,{
                     method: "POST",
                     body: formData,
                 });
-
-                setImage(null);
+                
+                const data = await response.json();
+                setImage(`${config.API_URL}/uploads/${data.filename}`);
+                setUrl(null);
                 onClose();
             } catch(err){
                 console.log("Error al subir imagen ",err);
@@ -81,7 +83,7 @@ export default function ModalCamara({isVisible, onClose}: Props){
     return (
         <Modal animationType="slide" transparent={true} visible={isVisible} onRequestClose={onClose}>
             <View style={styles.container}>
-                {!image ? 
+                {!url ? 
                 <View style={{
                     flex: 1,
                 }}>
@@ -114,10 +116,10 @@ export default function ModalCamara({isVisible, onClose}: Props){
                     </CameraView>
                 </View>
                 :
-                <Image source={{uri: image}} style={styles.camera}/>
+                <Image source={{uri: url}} style={styles.camera}/>
                 }
                 <View>
-                    { image ? 
+                    { url ? 
                     <View style={{
                         flexDirection: "row",
                         justifyContent: "space-between",
@@ -128,7 +130,7 @@ export default function ModalCamara({isVisible, onClose}: Props){
                             label="Re-take" 
                             icon="retweet" 
                             theme="camera" 
-                            onPress={() => setImage(null)} />
+                            onPress={() => setUrl(null)} />
                         <Button 
                             color="#f1f1f1"
                             label="Save" 
