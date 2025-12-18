@@ -19,6 +19,7 @@ const PlaceholderImage = require("../../assets/images/Predeterminada.png");
 
 export default function FormSensor(){
     const [text, onChangeText] = React.useState('Useless Text');
+    const [image, setImage] = useState<string | null>(null); 
     const router = useRouter();
     const navigation = useNavigation();
     
@@ -64,18 +65,29 @@ export default function FormSensor(){
     }, []);
 
     const handleHome = () => {
-        router.push("/(tabs)/home");
+        console.log(image);
+        //router.push("/(tabs)/home");
     }
-    
+
     return (
         <View style={styles.container}>
 
             <View style={styles.ImageContainer}>
+                { !image ?
                 <ImageViewer 
+                    theme="predetermined"
                     imgSource={PlaceholderImage}  
                     sizeWidth={300}
                     sizeHeight={200}
                 />
+                :
+                <ImageViewer 
+                    theme="photo"
+                    imgSource={image}  
+                    sizeWidth={300}
+                    sizeHeight={200}
+                />
+                }
                 <Button color="" label="" icon="camera" theme="primary" onPress={openCamera} />
             </View>
 
@@ -106,6 +118,7 @@ export default function FormSensor(){
             </TouchableOpacity>
 
             { modalCameraVisible && (<ModalCamara
+                setImage={setImage}
                 isVisible={modalCameraVisible}
                 onClose={() => setModalCameraVisible(false)}>
             </ModalCamara>)}

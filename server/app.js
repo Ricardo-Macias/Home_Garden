@@ -69,10 +69,12 @@ app.get("/crop", async (req, res) => {
     Subir Imagen
 */
 
+app.use("/uploads", express.static("uploads"));
+
 app.post("/upload", upload.single("image"), (req, res) => {
     res.json({
         message: "Imagen subida correctamente",
-        file: req.file,
+        filename: req.file.filename
     });
 });
 
