@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     apellidos VARCHAR(180) NOT NULL,
     correo VARCHAR(180) NOT NULL UNIQUE,
     pass VARCHAR(80) NOT NULL,
-    imagen VARCHAR(250)
+    imagen VARCHAR(180)
 );
 
 CREATE TABLE IF NOT EXISTS cultivo (
@@ -22,18 +22,32 @@ CREATE TABLE IF NOT EXISTS cultivo (
 );
 
 CREATE TABLE IF NOT EXISTS sensor(
-	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    idUsuario INT NOT NULL,
+	idSensor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(180),
-    FOREIGN KEY(idUsuario) REFERENCES usuario(id)
+    serviceUuid VARCHAR(36),
+    ssidCharUuid VARCHAR(36),
+    passCharUuid VARCHAR(36)
+);
+
+CREATE TABLE IF NOT EXISTS sensorWifi(
+    idSensorWifi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idUsuario INT NOT NULL,
+    idSensor INT NOT NULL,
+    ip VARCHAR(15) NOT NULL,
+    FOREIGN KEY(idUsuario) REFERENCES usuario(id),
+    FOREIGN KEY(idSensor) REFERENCES sensor(idSensor)
 );
 
 CREATE TABLE IF NOT EXISTS huerto (
-	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    idSensor INT NOT NULL,
+	idHuerto INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idSensorWifi INT NOT NULL,
     idCultivo INT NOT NULL,
+    nombre VARCHAR(80),
+    estado BOOLEAN,
+    imagen VARCHAR(180),
     fechaInicio DATE NOT NULL,
     fechaEstimada DATE,
-    FOREIGN KEY(idSensor) REFERENCES sensor(id),
+    fechaFin DATE,
+    FOREIGN KEY(idSensorWifi) REFERENCES sensorWifi(idSensorWifi),
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
 );
