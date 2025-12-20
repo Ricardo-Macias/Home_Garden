@@ -8,6 +8,10 @@ import {
 import cors from 'cors';
 import multer from "multer";
 import path from "path";
+import { 
+    addHomeVegetableGarden,
+    allHomeVegetableGarden
+ } from "./controllers/cropController.js"
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -51,10 +55,9 @@ app.get("/sensor/:id", async (req, res) => {
  * HUERTO
  */
 
-app.get("/garden/:id", async (req, res) => {
-    const garden = await getGarden(req.params.id);
-    res.status(200).send(garden);
-});
+
+app.post("/addHomeVegetableGarden", addHomeVegetableGarden);
+app.get("/allHomeVegetableGarden", allHomeVegetableGarden);
 
 /**
  * CULTIVO
