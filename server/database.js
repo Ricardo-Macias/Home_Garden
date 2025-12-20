@@ -88,6 +88,12 @@ export async function updateSensor(id, name) {
 /*
  *  Consultas en la tabla huerto
 */
+export async function getAllGarden(){
+    const [row] = await pool.query(
+        `SELECT * FROM huerto`
+    );
+    return row;
+}
 
 export async function getGarden(idSensor) {
     const [row] = await pool.query(
@@ -97,11 +103,11 @@ export async function getGarden(idSensor) {
     return row[0];
 }
 
-export async function insertGarden(idSensor, idCrop) {
+export async function insertGarden(idSensorWifi, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) {
     const [result] = await pool.query(
-        `INSERT INTO huerto (idSensor, idCultivo, fechaInicio, fechaEstimada) 
-        VALUE (?, ?, ?, ?)`,
-        [idSensor, idCrop]
+        `INSERT INTO huerto (idSensorWifi, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) 
+        VALUE (?, ?, ?, ?, ?, ?, ?)`,
+        [idSensorWifi, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen]
 
     );
     return result;
