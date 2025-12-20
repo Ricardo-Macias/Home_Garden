@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState} from "react";
 import { useRouter, useNavigation } from "expo-router";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -18,7 +18,7 @@ const config = Constants.expoConfig?.extra as AppConfig;
 const PlaceholderImage = require("../../assets/images/Predeterminada.png");
 
 export default function FormSensor(){
-    const [text, onChangeText] = React.useState('Useless Text');
+    const [name, setName] = useState("");
     const [image, setImage] = useState<string | null>(null); 
     const router = useRouter();
     const navigation = useNavigation();
@@ -64,10 +64,43 @@ export default function FormSensor(){
             });
     }, []);
 
-    const handleHome = () => {
-        console.log(image);
-        //router.push("/(tabs)/home");
-    }
+    const handleSumit = async () => {
+
+        if(!name || !value){
+            Alert.alert("Error", "Falta agregar un cultivo o un nombre");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${config.API_URL}/addHomeVegetableGarden`,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    idSensorWifi: 1,
+                    idCultivo: 1,
+                    nombre: name,
+                    fechaInicio: "2025-12-19",
+                    fechaEstimada: "2025-12-19",
+                    estado: 0,
+                    imagen: image,
+                }),
+            });
+
+            const data = await response.json();
+            if(!response.ok){
+                throw new Error(data.message || "Error al registrar");
+            }
+
+            Alert.alert("Exito", "Usuario registrado correctamente");
+
+        } catch(err: any){
+            Alert.alert("Error", err.message);
+        }
+
+        router.push("/(tabs)/home");
+    };
 
     return (
         <View style={styles.container}>
@@ -94,7 +127,8 @@ export default function FormSensor(){
             <Text style={styles.text}>Nombre</Text>
             <View style={styles.InputContainer}>
                 <TextInput 
-                    onChangeText={onChangeText} 
+                    value={name}
+                    onChangeText={setName} 
                     style={styles.TextInput} 
                     placeholder="Nombre del sensor">
                 </TextInput>
@@ -113,7 +147,7 @@ export default function FormSensor(){
                     />
             </View>
 
-            <TouchableOpacity onPress={handleHome} style={styles.Button}>
+            <TouchableOpacity onPress={handleSumit} style={styles.Button}>
                 <Text style={styles.textButton}>Registrar sensor</Text>
             </TouchableOpacity>
 
