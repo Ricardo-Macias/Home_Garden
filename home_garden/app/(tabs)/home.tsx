@@ -1,4 +1,3 @@
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { Router, useRouter } from "expo-router";
@@ -71,14 +70,14 @@ export default function Home() {
     }, [modalWifiVisible])
     
     async function fetchData() {
-        const response = await fetch(`${config.API_URL}/sensor/1`);
+        const response = await fetch(`${config.API_URL}/allHomeVegetableGarden`);
         const data = await response.json();
 
         setUser(data);
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <View >
                 <Text> Bienvenido </Text>
                 <Text>{ JSON.stringify(users) }</Text>
@@ -106,7 +105,7 @@ export default function Home() {
                     <></>
                 </ModalConnectWifi> )}
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 const styles = StyleSheet.create({
