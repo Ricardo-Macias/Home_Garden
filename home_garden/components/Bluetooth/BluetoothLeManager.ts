@@ -3,18 +3,13 @@ import { useMemo, useState } from "react";
 import { 
     BleManager, 
     Device,
-    BleError,
-    Characteristic, 
 } from "react-native-ble-plx";
 
 import * as expoDevice from "expo-device";
 
-//import base64 from "react-native-base64"
-
-const SERVICE_UUID = "79f0dfb3-5f08-4502-8ff0-5a9b2396aab1";
-const SSID_CHAR_UUID = "d24233d0-b34d-4bbe-8f2a-f661530c6217";
-const PASS_CHAR_UUID = "ef1c20a3-26b6-4aab-88dc-e377f105e8f4";
-
+const SERVICE_UUID = "e72640a5-7d6f-401a-b506-8355a871f404";
+const SSID_CHAR_UUID = "92f0538e-66f2-48f4-bf43-94e3d3fdf475";
+const PASS_CHAR_UUID = "53c48d51-2386-4584-8a8b-eb17ad324324";
 
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>;
