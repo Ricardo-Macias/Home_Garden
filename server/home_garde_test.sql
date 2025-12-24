@@ -22,20 +22,10 @@ CREATE TABLE IF NOT EXISTS cultivo (
 );
 
 CREATE TABLE IF NOT EXISTS sensor(
-	idSensor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(180),
-    serviceUuid VARCHAR(36),
-    ssidCharUuid VARCHAR(36),
-    passCharUuid VARCHAR(36)
-);
-
-CREATE TABLE IF NOT EXISTS sensorWifi(
-    idSensorWifi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idSensor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idUsuario INT NOT NULL,
-    idSensor INT NOT NULL,
     ip VARCHAR(15) NOT NULL,
     FOREIGN KEY(idUsuario) REFERENCES usuario(id),
-    FOREIGN KEY(idSensor) REFERENCES sensor(idSensor)
 );
 
 CREATE TABLE IF NOT EXISTS huerto (
