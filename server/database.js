@@ -60,13 +60,13 @@ export async function getSensors(idUsuario) {
     return row;
 }
 
-export async function insertSensor(idUsuario, name) {
+export async function insertSensor(idUsuario, ip) {
     const [result] = await pool.query(
-        `INSERT INTO sensor (idUsuario, nombre) VALUES (?, ?)`,
-        [idUsuario, name]
+        `INSERT INTO sensor (idUsuario, ip) VALUES (?, ?)`,
+        [idUsuario, ip]
     );
-    //const sensorID = result.insertId;
-    return result;
+    const sensorID = result.insertId;
+    return sensorID;
 }
 
 export async function deleteSensor(id) {
@@ -103,11 +103,11 @@ export async function getGarden(idSensor) {
     return row[0];
 }
 
-export async function insertGarden(idSensorWifi, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) {
+export async function insertGarden(idSensor, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) {
     const [result] = await pool.query(
-        `INSERT INTO huerto (idSensorWifi, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) 
+        `INSERT INTO huerto (idSensor, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) 
         VALUE (?, ?, ?, ?, ?, ?, ?)`,
-        [idSensorWifi, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen]
+        [idSensor, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen]
 
     );
     return result;

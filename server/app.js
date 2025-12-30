@@ -10,6 +10,7 @@ import multer from "multer";
 import path from "path";
 import { 
     addHomeVegetableGarden,
+    addSensor,
     allHomeVegetableGarden
  } from "./controllers/cropController.js"
 
@@ -50,6 +51,8 @@ app.get("/sensor/:id", async (req, res) => {
     const sensor = await getSensors(req.params.id);
     res.status(200).send(sensor);
 });
+
+app.post("/addSensor", addSensor);
 
 /**
  * HUERTO

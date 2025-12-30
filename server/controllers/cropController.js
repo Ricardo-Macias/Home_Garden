@@ -1,7 +1,27 @@
 import {
     insertGarden,
+    insertSensor,
     getAllGarden
 } from "../database.js";
+
+// Agregar sensor
+
+export async function addSensor(req, res){
+    const {
+        idUsuario,
+        ip
+    } = req.body;
+
+    try {
+        const result = await insertSensor(idUsuario, ip);
+
+        res.json({
+            idSensor: result
+        });
+    } catch (err) {
+        console.log("Error al registrar sensor: ", err);
+    }
+}
 
 // Agregar huerto
 export async function allHomeVegetableGarden(req, res){
@@ -16,7 +36,7 @@ export async function allHomeVegetableGarden(req, res){
 
 export async function addHomeVegetableGarden(req, res){
     const { 
-        idSensorWifi,
+        idSensor,
         idCultivo,
         nombre,
         fechaInicio,
@@ -25,7 +45,7 @@ export async function addHomeVegetableGarden(req, res){
         imagen } = req.body;
 
         try {
-            const result = await insertGarden(idSensorWifi,
+            const result = await insertGarden(idSensor,
                 idCultivo,
                 nombre,
                 fechaInicio,
