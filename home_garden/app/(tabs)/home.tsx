@@ -22,7 +22,6 @@ export default function Home() {
 
     const [users, setUser] = useState([]);
 
-
     const {
         requestPermissions,
         scanForPeripherals,
@@ -65,7 +64,27 @@ export default function Home() {
     useEffect(() => {
         if (!modalWifiVisible && password != "" && ssid != ""){
             sendCredentials(ssid,password);
-            router.push("/sensor/AddSensor");
+            const addSensor = async () => {
+                const response = await fetch(`${config.API_URL}/addSensor`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        idUsuario: 1, //Cambiar al id del usuario
+                        ip: "1.2.3.4", // Revisando si quitar o dejar
+                    }),
+                });
+                const data = await response.json();
+
+                router.push({
+                    pathname: "/sensor/AddSensor",
+                    params: {
+                        sensor: data.idSensor,
+                    },
+                });
+            };
+            addSensor();
         }
     }, [modalWifiVisible])
     
