@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState} from "react";
-import { useRouter, useNavigation } from "expo-router";
+import { useRouter, useNavigation, useLocalSearchParams } from "expo-router";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
@@ -20,8 +20,34 @@ const PlaceholderImage = require("../../assets/images/Predeterminada.png");
 export default function FormSensor(){
     const [name, setName] = useState("");
     const [image, setImage] = useState<string | null>(null); 
+    const {sensor} = useLocalSearchParams();
     const router = useRouter();
     const navigation = useNavigation();
+
+    // Fecha de inicio
+    const date = new Date();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const startDate = `${year}-${month}-${day}`;
+
+    const estimatedDate = async () => {
+        const today = new Date();
+        const estimated = new Date(today);
+
+        try {
+            const response = await fetch(`${config.API_URL}/durationCrop/${value}`);
+
+            const data = await response.json();
+            estimated.setDate(estimated.getDate() + data.duration);
+
+            const formatEstimatedDate = `${estimated.getFullYear()}-${estimated.getMonth()+1}-${estimated.getDate()}`;
+            return formatEstimatedDate;
+        } catch(err){
+            console.log("Error: ", err);
+        }
+    }
+    //-----------------------------------------
     
     // Cambia el encabezado
     useLayoutEffect(() => {
@@ -64,7 +90,21 @@ export default function FormSensor(){
             });
     }, []);
 
+    const  searchIdCrop = async () => {
+        try {
+            const response = await fetch(`${config.API_URL}/searchIdCrop/${value}`);
+
+            const data = await response.json();
+            return data.idCrop;
+            
+        } catch (err) {
+            console.log("Error al buscar el id del cultivo: ", err);
+        }
+    }
+
     const handleSumit = async () => {
+        const cropId = await searchIdCrop();
+        const cropDuration = await estimatedDate();
 
         if(!name || !value){
             Alert.alert("Error", "Falta agregar un cultivo o un nombre");
@@ -78,11 +118,11 @@ export default function FormSensor(){
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    idSensorWifi: 1,
-                    idCultivo: 1,
+                    idSensor: sensor,
+                    idCultivo: cropId,
                     nombre: name,
-                    fechaInicio: "2025-12-19",
-                    fechaEstimada: "2025-12-19",
+                    fechaInicio: startDate,
+                    fechaEstimada: cropDuration,
                     estado: 0,
                     imagen: image,
                 }),
@@ -99,7 +139,7 @@ export default function FormSensor(){
             Alert.alert("Error", err.message);
         }
 
-        router.push("/(tabs)/home");
+        router.push("/(tabs)/home"); 
     };
 
     return (
