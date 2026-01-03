@@ -1,11 +1,38 @@
 import {
     insertGarden,
     insertSensor,
-    getAllGarden
+    getAllGarden,
+    getIdCrop,
+    getDurationCrop
 } from "../database.js";
 
-// Agregar sensor
+// Buscar id del cultivo
+export async function searchIdCrop(req, res){
 
+    try {
+        const result = await getIdCrop(req.params.nombre);
+        res.json({
+            idCrop: result
+        });
+    } catch(err){
+        console.log("Error al buscar id del cultivo ", err);
+    }
+}
+
+// Buscar el tiempo de duracion del cultivo
+export async function durationCrop(req, res){
+    try {
+        const result = await getDurationCrop(req.params.nombre);
+        res.json({
+            duration: result
+        });
+    } catch (err){
+        console.log("Error al buscar duracion del huerto: ", err);
+    }
+
+}
+
+// Agregar sensor
 export async function addSensor(req, res){
     const {
         idUsuario,

@@ -11,7 +11,9 @@ import path from "path";
 import { 
     addHomeVegetableGarden,
     addSensor,
-    allHomeVegetableGarden
+    allHomeVegetableGarden,
+    durationCrop,
+    searchIdCrop
  } from "./controllers/cropController.js"
 
 const corsOptions = {
@@ -56,16 +58,17 @@ app.post("/addSensor", addSensor);
 
 /**
  * HUERTO
- */
-
+*/
 
 app.post("/addHomeVegetableGarden", addHomeVegetableGarden);
 app.get("/allHomeVegetableGarden", allHomeVegetableGarden);
 
 /**
  * CULTIVO
- */
+*/
 
+app.get("/searchIdCrop/:nombre", searchIdCrop);
+app.get("/durationCrop/:nombre", durationCrop);
 app.get("/crop", async (req, res) => {
     const crop = await getAllCrop();
     res.status(200).send(crop);

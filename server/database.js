@@ -133,6 +133,24 @@ export async function updateGarden(id, idCrop) {
  *  Consultas en la tabla cultivo
 */
 
+export async function getIdCrop(name){
+    const [row] = await pool.query(
+        `SELECT * FROM cultivo WHERE nombre = ?`,
+        [name]
+    );
+    const cropId = row[0].id;
+    return cropId;
+}
+
+export async function getDurationCrop(name){
+    const [row] = await pool.query(
+        `SELECT * FROM cultivo WHERE nombre = ?`,
+        [name]
+    );
+    const duration = row[0].duracion;
+    return duration;
+}
+
 export async function getAllCrop() {
     const [row] = await pool.query(
         `SELECT * FROM cultivo`
