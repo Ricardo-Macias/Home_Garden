@@ -17,10 +17,8 @@ const pool = mysql
 */
 
 
-
 // INSERTAR USUARIO: guarda contraseña cifrada
 export async function insertUser(name, lastName, email, pass) {
-    // genera hash con salt de 10 rondas
     const hashedPass = await bcrypt.hash(pass, 10);
 
     const [result] = await pool.query(
@@ -30,7 +28,7 @@ export async function insertUser(name, lastName, email, pass) {
     return result;
 }
 
-// LOGIN: compara contraseña ingresada con hash guardado
+// LOGIN
 export async function findUserForLogin(email, pass) { 
     const [rows] = await pool.query(
         `SELECT * FROM usuario WHERE correo = ?`,
@@ -73,7 +71,35 @@ export async function deleteUser(id) {
     return result.affectedRows > 0; // true si se eliminó
 }
 
+/*
+ * Consultas de perfil
+*/
+ // PERFIL: obtener datos del usuario + historial de huertos
+export async function getUserProfile(idUsuario) {
+    // Datos básicos del usuario
+    const [userRows] = await pool.query(
+        `SELECT id, nombre, apellidos, correo 
+         FROM usuario 
+         WHERE id = ?`,
+        [idUsuario]
+    );
 
+    if (!userRows[0]) return null;
+
+    // Historial desde la vista (usa idUsuario, no usuario_id)
+    const [historialRows] = await pool.query(
+        `SELECT * FROM vista_historial_huertos WHERE idUsuario = ?`,
+        [idUsuario]
+    );
+
+    return {
+        id: userRows[0].id,
+        nombre: userRows[0].nombre,
+        apellidos: userRows[0].apellidos,
+        correo: userRows[0].correo,
+        historial: historialRows
+    };
+}
 
 
 /*

@@ -36,7 +36,7 @@ export async function login(req, res) {
 
 
 
-// REGISTER 
+// REGISTRAR 
 export async function register(req, res) {
 
     const { nombre, apellidos, correo, pass } = req.body;
