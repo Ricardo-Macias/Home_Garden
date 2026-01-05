@@ -66,7 +66,6 @@ export const registerUser = createAsyncThunk(
                 return rejectWithValue(data.error || "Error al registrar");
             }
 
-            // no guardar tokens
             return data;
 
         } catch (err: any) {
@@ -154,7 +153,7 @@ const authSlice = createSlice({
             state.status = "idle";
         });
 
-        // REGISTER
+        // REGISTRAR
         builder.addCase(registerUser.pending, (state) => {
             state.status = "loading";
         });
