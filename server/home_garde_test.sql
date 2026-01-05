@@ -48,10 +48,15 @@ CREATE TABLE IF NOT EXISTS huerto (
 
 CREATE VIEW vw_home AS
     SELECT 
+    u.id AS usuario,
+    s.idSensor AS sensor,
     h.nombre AS huerto,
     c.nombre AS cultivo,
     h.imagen AS imagen,
     h.fechaInicio AS inicio,
     h.fechaEstimada AS termina
     FROM huerto h
-    JOIN cultivo c ON h.estado = 0 AND h.idCultivo = c.id;
+    JOIN cultivo c ON h.idCultivo = c.id
+    JOIN sensor s ON h.idSensor = s.idSensor
+    JOIN USUARIO u ON u.id = s.idUsuario
+    AND estado = 0;
