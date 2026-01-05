@@ -61,7 +61,7 @@ app.post("/addSensor", addSensor);
 */
 
 app.post("/addHomeVegetableGarden", addHomeVegetableGarden);
-app.get("/allHomeVegetableGarden", allHomeVegetableGarden);
+app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 
 /**
  * CULTIVO

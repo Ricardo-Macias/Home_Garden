@@ -88,9 +88,10 @@ export async function updateSensor(id, name) {
 /*
  *  Consultas en la tabla huerto
 */
-export async function getAllGarden(){
+export async function getAllGarden(idUsuario){
     const [row] = await pool.query(
-        `SELECT * FROM huerto`
+        `SELECT * FROM vw_home WHERE usuario = ?`,
+        [idUsuario]
     );
     return row;
 }

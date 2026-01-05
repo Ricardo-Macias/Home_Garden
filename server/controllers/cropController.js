@@ -53,7 +53,7 @@ export async function addSensor(req, res){
 // Agregar huerto
 export async function allHomeVegetableGarden(req, res){
     try{
-        const result = await getAllGarden();
+        const result = await getAllGarden(req.params.id);
         res.status(200).send(result);
 
     } catch(err){
