@@ -41,3 +41,17 @@ CREATE TABLE IF NOT EXISTS huerto (
     FOREIGN KEY(idSensorWifi) REFERENCES sensorWifi(idSensorWifi),
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
 );
+
+/*
+    VISTAS
+*/
+
+CREATE VIEW vw_home AS
+    SELECT 
+    h.nombre AS huerto,
+    c.nombre AS cultivo,
+    h.imagen AS imagen,
+    h.fechaInicio AS inicio,
+    h.fechaEstimada AS termina
+    FROM huerto h
+    JOIN cultivo c ON h.estado = 0 AND h.idCultivo = c.id;
