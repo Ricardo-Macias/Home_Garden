@@ -89,7 +89,7 @@ export default function Home() {
     }, [modalWifiVisible])
     
     async function fetchData() {
-        const response = await fetch(`${config.API_URL}/allHomeVegetableGarden`);
+        const response = await fetch(`${config.API_URL}/allHomeVegetableGarden/1`);
         const data = await response.json();
 
         setUser(data);
