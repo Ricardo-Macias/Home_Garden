@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 dotenv.config();
 
 const pool = mysql
@@ -15,38 +16,91 @@ const pool = mysql
  *  Consultas en la tabla usuario
 */
 
-export async function login(email, pass) {
+
+// INSERTAR USUARIO: guarda contraseña cifrada
+export async function insertUser(name, lastName, email, pass) {
+    const hashedPass = await bcrypt.hash(pass, 10);
+
     const [result] = await pool.query(
+        `INSERT INTO usuario (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
+        [name, lastName, email, hashedPass]
+    );
+    return result;
+}
+
+// LOGIN
+export async function findUserForLogin(email, pass) { 
+    const [rows] = await pool.query(
         `SELECT * FROM usuario WHERE correo = ?`,
         [email]
     );
 
-    return result[0]['pass'] == pass ? result[0] : false;
+    if (!rows[0]) return false;
+
+    // Compara contraseña ingresada con la cifrada
+    const match = await bcrypt.compare(pass, rows[0].pass);
+
+    return match ? { id: rows[0].id, nombre: rows[0].nombre, correo: rows[0].correo } : false;
 }
 
-export async function insertUser(name, lastName, email, pass) {
-    const [result] = await pool.query(
-        `INSERT INTO (nombre, apellidos, correo, pass) VALUES (?, ?, ?, ?)`,
-        [name, lastName, email, pass]
+
+// BUSCAR POR CORREO (para validar duplicados)
+export async function findUserByCorreo(correo) {
+    const [rows] = await pool.query(
+        `SELECT * FROM usuario WHERE correo = ?`,
+        [correo]
     );
-
-    return result
+    return rows.length > 0 ? rows[0] : null;
 }
 
+// OBTENER USUARIO POR ID
+export async function getUserById(id) {
+    const [rows] = await pool.query(
+        `SELECT id, nombre, apellidos, correo FROM usuario WHERE id = ?`,
+        [id]
+    );
+    return rows[0];
+}
+
+// ELIMINAR USUARIO
 export async function deleteUser(id) {
     const [result] = await pool.query(
         `DELETE FROM usuario WHERE id = ?`,
         [id]
     );
+    return result.affectedRows > 0; // true si se eliminó
 }
 
-export async function updateUser(email, pass) {
-    const [result] = await pool.query(
-        `UPDATE usuario SET correo = ?, pass = ?`,
-        [email, pass]
+/*
+ * Consultas de perfil
+*/
+ // PERFIL: obtener datos del usuario + historial de huertos
+export async function getUserProfile(idUsuario) {
+    // Datos básicos del usuario
+    const [userRows] = await pool.query(
+        `SELECT id, nombre, apellidos, correo 
+         FROM usuario 
+         WHERE id = ?`,
+        [idUsuario]
     );
-    return result
+
+    if (!userRows[0]) return null;
+
+    // Historial desde la vista (usa idUsuario, no usuario_id)
+    const [historialRows] = await pool.query(
+        `SELECT * FROM vista_historial_huertos WHERE idUsuario = ?`,
+        [idUsuario]
+    );
+
+    return {
+        id: userRows[0].id,
+        nombre: userRows[0].nombre,
+        apellidos: userRows[0].apellidos,
+        correo: userRows[0].correo,
+        historial: historialRows
+    };
 }
+
 
 /*
  *  Consultas en la tabla sensor 

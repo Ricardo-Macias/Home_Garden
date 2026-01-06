@@ -1,11 +1,25 @@
 import express from "express";
+import cors from "cors";
+
+
+import perfilRoutes from './routes/profile.js';
 import {
     getAllCrop,
     getGarden,
-    getSensors,
-    login,
+    getSensors
 } from "./database.js";
-import cors from 'cors';
+
+// Importar controladores
+import { 
+    login, 
+    register, 
+    refreshToken 
+} from "./controllers/authController.js";
+
+import { 
+    getUser, 
+    removeUser 
+} from "./controllers/userController.js";
 import multer from "multer";
 import path from "path";
 import { 
@@ -18,8 +32,9 @@ import {
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
-    methods: ["POST", "GET"],
+    methods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 const app = express();
@@ -39,16 +54,16 @@ const upload = multer({ storage })
 /**
  * USUARIO
  */
+app.post("/login", login);
+app.post("/register", register);
+app.post("/refresh", refreshToken);
 
-app.get("/user/:email/:pass", async (req, res) => {
-    const user = await login(req.params.email, req.params.pass);
-    res.status(200).send(user);
-});
+app.get("/user/:id", getUser);
+app.delete("/user/:id", removeUser);
 
 /**
  * SENSORES
  */
-
 app.get("/sensor/:id", async (req, res) => {
     const sensor = await getSensors(req.params.id);
     res.status(200).send(sensor);
@@ -88,11 +103,23 @@ app.post("/upload", upload.single("image"), (req, res) => {
 });
 
 /*
-    app.put - Actualizar
-    app.delete - Eliminar
-    app.post - Agregar
-    app.get - Obtener
+    Subir Imagen
 */
+
+app.use("/uploads", express.static("uploads"));
+
+app.post("/upload", upload.single("image"), (req, res) => {
+    res.json({
+        message: "Imagen subida correctamente",
+        filename: req.file.filename
+    });
+});
+
+/**
+ * PERFIL
+*/
+app.use(perfilRoutes);
+
 
 app.listen(8080, () => {
     console.log("Server running on port 8080");
