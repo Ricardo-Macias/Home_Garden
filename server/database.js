@@ -114,13 +114,13 @@ export async function getSensors(idUsuario) {
     return row;
 }
 
-export async function insertSensor(idUsuario, name) {
+export async function insertSensor(idUsuario, ip) {
     const [result] = await pool.query(
-        `INSERT INTO sensor (idUsuario, nombre) VALUES (?, ?)`,
-        [idUsuario, name]
+        `INSERT INTO sensor (idUsuario, ip) VALUES (?, ?)`,
+        [idUsuario, ip]
     );
-    //const sensorID = result.insertId;
-    return result;
+    const sensorID = result.insertId;
+    return sensorID;
 }
 
 export async function deleteSensor(id) {
@@ -142,6 +142,13 @@ export async function updateSensor(id, name) {
 /*
  *  Consultas en la tabla huerto
 */
+export async function getAllGarden(idUsuario){
+    const [row] = await pool.query(
+        `SELECT * FROM vw_home WHERE usuario = ?`,
+        [idUsuario]
+    );
+    return row;
+}
 
 export async function getGarden(idSensor) {
     const [row] = await pool.query(
@@ -151,11 +158,11 @@ export async function getGarden(idSensor) {
     return row[0];
 }
 
-export async function insertGarden(idSensor, idCrop) {
+export async function insertGarden(idSensor, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) {
     const [result] = await pool.query(
-        `INSERT INTO huerto (idSensor, idCultivo, fechaInicio, fechaEstimada) 
-        VALUE (?, ?, ?, ?)`,
-        [idSensor, idCrop]
+        `INSERT INTO huerto (idSensor, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen) 
+        VALUE (?, ?, ?, ?, ?, ?, ?)`,
+        [idSensor, idCultivo, nombre, fechaInicio, fechaEstimada, estado, imagen]
 
     );
     return result;
@@ -180,6 +187,24 @@ export async function updateGarden(id, idCrop) {
 /*
  *  Consultas en la tabla cultivo
 */
+
+export async function getIdCrop(name){
+    const [row] = await pool.query(
+        `SELECT * FROM cultivo WHERE nombre = ?`,
+        [name]
+    );
+    const cropId = row[0].id;
+    return cropId;
+}
+
+export async function getDurationCrop(name){
+    const [row] = await pool.query(
+        `SELECT * FROM cultivo WHERE nombre = ?`,
+        [name]
+    );
+    const duration = row[0].duracion;
+    return duration;
+}
 
 export async function getAllCrop() {
     const [row] = await pool.query(

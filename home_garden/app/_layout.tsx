@@ -1,3 +1,4 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 import { Provider } from "react-redux";
 import { store } from "../Redux/store";

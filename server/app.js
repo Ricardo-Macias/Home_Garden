@@ -20,6 +20,15 @@ import {
     getUser, 
     removeUser 
 } from "./controllers/userController.js";
+import multer from "multer";
+import path from "path";
+import { 
+    addHomeVegetableGarden,
+    addSensor,
+    allHomeVegetableGarden,
+    durationCrop,
+    searchIdCrop
+ } from "./controllers/cropController.js"
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -31,6 +40,16 @@ const corsOptions = {
 const app = express();
 app.use(express.json());
 app.use(cors(corsOptions));
+
+const storage = multer.diskStorage({
+    destination: "uploads/",
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname) || ".jpg";
+        cb(null, `${Date.now()}${ext}`);
+    },
+})
+
+const upload = multer({ storage })
 
 /**
  * USUARIO
@@ -50,25 +69,55 @@ app.get("/sensor/:id", async (req, res) => {
     res.status(200).send(sensor);
 });
 
+app.post("/addSensor", addSensor);
+
 /**
  * HUERTO
- */
-app.get("/garden/:id", async (req, res) => {
-    const garden = await getGarden(req.params.id);
-    res.status(200).send(garden);
-});
+*/
+
+app.post("/addHomeVegetableGarden", addHomeVegetableGarden);
+app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 
 /**
  * CULTIVO
- */
+*/
+
+app.get("/searchIdCrop/:nombre", searchIdCrop);
+app.get("/durationCrop/:nombre", durationCrop);
 app.get("/crop", async (req, res) => {
     const crop = await getAllCrop();
     res.status(200).send(crop);
 });
 
+/*
+    Subir Imagen
+*/
+
+app.use("/uploads", express.static("uploads"));
+
+app.post("/upload", upload.single("image"), (req, res) => {
+    res.json({
+        message: "Imagen subida correctamente",
+        filename: req.file.filename
+    });
+});
+
+/*
+    Subir Imagen
+*/
+
+app.use("/uploads", express.static("uploads"));
+
+app.post("/upload", upload.single("image"), (req, res) => {
+    res.json({
+        message: "Imagen subida correctamente",
+        filename: req.file.filename
+    });
+});
+
 /**
  * PERFIL
- */
+*/
 app.use(perfilRoutes);
 
 

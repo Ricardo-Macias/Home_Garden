@@ -1,33 +1,32 @@
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { 
+    Modal, 
+    View, 
+    Text, 
+    Button,
+    StyleSheet, 
+    TouchableOpacity, 
+    ListRenderItemInfo,
+    FlatList,
+ } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Device } from "react-native-ble-plx";
 
 type Props = {
+    items: Device[];
     isVisible: boolean;
     children: React.ReactNode;
+    connectedToPeripheral: (device: Device) => void;
+    goToConnectedWifi: () => void;
     onClose: () => void;
 };
 
-export default function ModalSensor({ isVisible, children, onClose }: Props){
-    const router = useRouter();
-    const sensors = [{
-            id: 1,
-            name: "sensor 1"
-        },{
-            id: 2,
-            name: "sensor 2"
-        },{
-            id: 3,
-            name: "sensor 3"
-        },{
-            id: 4,
-            name: "sensor 4"
-        }
-    ];
+export default function ModalSensor({ items, isVisible, children, connectedToPeripheral, goToConnectedWifi, onClose }: Props){
 
-    const handleSensor = () => {
-        router.push("/sensor/AddSensor");
-    };
+    const connectAndClosedModal = async (device: Device) => {
+        connectedToPeripheral(device);
+        onClose();
+        goToConnectedWifi();
+    }
 
     return (
         <Modal animationType="slide" transparent={true} visible={isVisible}>
@@ -42,14 +41,19 @@ export default function ModalSensor({ isVisible, children, onClose }: Props){
                 </View>
                 {children}
                 <View style={styles.sensorsContainer}>
-                    {
-                        sensors.map((item) => <TouchableOpacity
-                            key={item.id}
-                            style={styles.sensorsItem}
-                            onPress={handleSensor}>
-                                <Text style={styles.sensorItemText}>{item.name}</Text>
-                            </TouchableOpacity>)
-                    }
+                    <FlatList 
+                    data={items}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({item}) => (
+                        <View style={styles.sensorsItem}>
+                            <TouchableOpacity
+                                style={{width: "100%",height: "100%" ,backgroundColor: "#6A1B9A", borderRadius: 5, justifyContent: "center", alignItems: "center"}}
+                                onPress={() => connectAndClosedModal(item)}>
+                                    <Text style={styles.sensorItemText}> { item.name } </Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    />
                 </View>
             </View>
         </Modal>
@@ -60,7 +64,7 @@ const styles = StyleSheet.create({
     modalContent: {
         height: "45%",
         width: "100%",
-        backgroundColor: "#1B3F31",
+        backgroundColor: "#FFF",
         borderTopRightRadius: 18,
         borderTopLeftRadius: 18,
         position: "absolute",
@@ -68,7 +72,7 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         height: "10%",
-        backgroundColor: "#367D62",
+        backgroundColor: "#6A1B9A",
         borderTopRightRadius: 10,
         borderTopLeftRadius: 10,
         paddingHorizontal: 20,
@@ -84,20 +88,17 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: "center",
+        padding: 10,
     },
     sensorsItem: {
-        backgroundColor: "blue",
-        padding: 5,
-        margin: 5,
-        height: "20%",
+    
+        height: 50,
         width: "45%",
-    },
+        },
     sensorItemText: {
-        fontSize: 25,
+        fontSize: 16,
         color: "#fff",
-        textAlign: "center",
-        textAlignVertical: "center",
+        
     }
 
 })

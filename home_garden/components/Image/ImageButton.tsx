@@ -1,45 +1,65 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { StyleSheet, View, Pressable, Text } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, View, Pressable, Text, TouchableOpacity } from "react-native";
+
+type FontAwesomeIconName = 
+    React.ComponentProps<typeof FontAwesome>["name"];
 
 type Props = {
+    color: string;
     label: string;
-    theme?: "primary";
+    icon: FontAwesomeIconName;
+    theme?: "primary" | "camera";
+    onPress: () => void;
 };
 
-export default function Button({ label, theme}: Props){
+export default function Button({ color, label, icon, theme, onPress}: Props){
     if (theme === "primary") {
         return (
             <View
                 style={[
-                    styles.buttonContainer,{borderWidth: 4, borderColor: "#6a1b9a", borderRadius: 10 }
+                    styles.buttonContainer,{borderWidth: 1, borderColor: "#6a1b9a", borderRadius: 10 }
                 ]}
             >
                 <Pressable
                     style= {[styles.button, {backgroundColor: "#fff"}]}
-                    onPress={() => alert("You pressed a button.")}
+                    onPress={onPress}
                 >
                     <FontAwesome
-                    name="picture-o"
+                    name={icon}
                     size={18}
                     color="#25292e"
-                    style={styles.buttonIcon}
                     />
-                    <Text style={styles.buttonLabel}>{label}</Text>
                 </Pressable>
 
             </View>
         );
     };
+
+    if (theme === "camera") {
+        return (
+            <TouchableOpacity onPress={onPress} style={styles.buttonCamera}>
+                <FontAwesome 
+                    name={icon}
+                    size={28} 
+                    color={color} />
+                <Text style={styles.label}>{label}</Text>
+            </TouchableOpacity>
+        )
+    };
 }
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        width: 320,
-        height: 68,
-        marginHorizontal: 20,
+        position: "absolute",
+        bottom: 5,
+        right: 0,
+        width: "15%",
+        height: "15%",
         alignItems: "center",
         justifyContent: "center",
-        padding: 2,
+        flexDirection: "row",
     },
     button: {
         borderRadius: 10,
@@ -49,11 +69,16 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flexDirection: "row",
     },
-    buttonIcon: {
-        paddingRight: 8,
+    buttonCamera: {
+        height: 40,
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "center",
     },
-    buttonLabel: {
-        color: "#000",
+    label: {
+        fontWeight: "bold",
         fontSize: 16,
+        color: "#f1f1f1",
+        marginLeft: 10,
     },
 })
