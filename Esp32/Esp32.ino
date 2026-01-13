@@ -3,8 +3,14 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 #include <WiFi.h>
+#include <DHT.h>
+#include <HTTPClient.h>
 
 Preferences prefs;
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+#define soil_moisture_pin 33
 
 #define WIFI_SERVICE_UUID "e72640a5-7d6f-401a-b506-8355a871f404"
 #define WIFI_SSID_CHAR_UUID "92f0538e-66f2-48f4-bf43-94e3d3fdf475"
@@ -14,6 +20,9 @@ String deviceName;
 
 String receivedSSID;
 String receivedPassword;
+const char* serverUrl = "http://192.168.3.5:8080/sensorData";
+
+DHT dht(DHTPIN, DHTTYPE);
 
 /*
   Generar nombre del esp32
@@ -139,12 +148,72 @@ void setupBluetooth() {
   BLEDevice::startAdvertising();
 }
 
+/*
+  Sensor DHT11 - Humedad y Temperatura.
+*/
+
+void temperatureAndHumidity(){
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  if (isnan(humidity) || isnan(temperature)){
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+  Serial.print(F("Humedad: "));
+  Serial.print(humidity);
+  Serial.print(F("% Temperatura: "));
+  Serial.print(temperature);
+  Serial.println(F("°C "));
+}
+
+/*
+  Sensor YL-69 - Humeadad de la Tierra.
+*/
+
+void soilMoisture(){
+  int sensorValue = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
+  Serial.print("Humedad del suelo: ");
+  Serial.print(sensorValue);
+  Serial.println(" %");
+  delay(1000);
+}
+
+/*
+  Guardar registros en la base de datos.
+*/
+
+void saveData(temperature, humedity, soil_moisture, light){
+  if(WiFi.status() == WL_CONNECTED){
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+
+    String json = "{";
+    json += "\"device_id\":\"esp32_1\",";
+    json += "\"temperatura\":" + String(temperature) + ",";
+    json += "\"humedadAmbiente\":" + String(humedity) + ",";
+    json += "\"humedadSuelo\":" + String(soil_moisture) + ",";
+    json += "\"luz\":" + String(light);
+    json += "}";
+
+    int httpCode = http.POST(json);
+    http.end();
+  }
+
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
   saveConfig();
-}
+
+  pinMode(soil_moisture_pin, INPUT);
+  dht.begin();
+} 
 
 void loop() {
-
+  delay(2000);
+  //temperatureAndHumidity();
+  //soilMoisture();
 }
