@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS cultivo (
 CREATE TABLE IF NOT EXISTS sensor(
     idSensor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idUsuario INT NOT NULL,
-    ip VARCHAR(15) NOT NULL,
+    deviceName VARCHAR(20) NOT NULL,
     FOREIGN KEY(idUsuario) REFERENCES usuario(id),
 );
 
