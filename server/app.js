@@ -20,15 +20,19 @@ import {
     getUser, 
     removeUser 
 } from "./controllers/userController.js";
+
 import multer from "multer";
 import path from "path";
+
 import { 
     addHomeVegetableGarden,
     addSensor,
     allHomeVegetableGarden,
     durationCrop,
     searchIdCrop
- } from "./controllers/cropController.js"
+} from "./controllers/cropController.js"
+
+
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -103,17 +107,10 @@ app.post("/upload", upload.single("image"), (req, res) => {
 });
 
 /*
-    Subir Imagen
+    Subir datos de los sensores
 */
 
-app.use("/uploads", express.static("uploads"));
-
-app.post("/upload", upload.single("image"), (req, res) => {
-    res.json({
-        message: "Imagen subida correctamente",
-        filename: req.file.filename
-    });
-});
+app.post("/sensorData", sensorData);
 
 /**
  * PERFIL
