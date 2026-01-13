@@ -114,6 +114,15 @@ export async function getSensors(idUsuario) {
     return row;
 }
 
+export async function searchForSensorByName(name) {
+    const [row] = await pool.query(
+        `SELECT * FROM sensor WHERE nombre = ?`,
+        [name]
+    );
+    const sensorID = result.insertId;
+    return sensorID;
+}
+
 export async function insertSensor(idUsuario, ip) {
     const [result] = await pool.query(
         `INSERT INTO sensor (idUsuario, ip) VALUES (?, ?)`,
@@ -121,6 +130,15 @@ export async function insertSensor(idUsuario, ip) {
     );
     const sensorID = result.insertId;
     return sensorID;
+}
+
+export async function insertSensorData(idSensor, temperature, humedity, soilMoisture, light){
+    const [result] = await pool.query(
+        `INSERT INTO sensor_data (idSensor, temperatura, humedadAmbiente, humedadSuelo, luz) VALUES (?, ?, ?, ?, ?)`,
+        [idSensor, temperature, humedity, soilMoisture, light]
+    );
+    
+    return result;
 }
 
 export async function deleteSensor(id) {
