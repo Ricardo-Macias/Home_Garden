@@ -7,11 +7,12 @@ import {
     TouchableOpacity, 
     ListRenderItemInfo,
     FlatList,
- } from "react-native";
+} from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Device } from "react-native-ble-plx";
 
 type Props = {
+    setDeviceName: React.Dispatch<React.SetStateAction<string | null>>;
     items: Device[];
     isVisible: boolean;
     children: React.ReactNode;
@@ -20,10 +21,11 @@ type Props = {
     onClose: () => void;
 };
 
-export default function ModalSensor({ items, isVisible, children, connectedToPeripheral, goToConnectedWifi, onClose }: Props){
+export default function ModalSensor({setDeviceName, items, isVisible, children, connectedToPeripheral, goToConnectedWifi, onClose }: Props){
 
     const connectAndClosedModal = async (device: Device) => {
         connectedToPeripheral(device);
+        setDeviceName(device.localName)
         onClose();
         goToConnectedWifi();
     }
