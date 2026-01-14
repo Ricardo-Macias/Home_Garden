@@ -6,6 +6,7 @@ import {
 export async function sensorData(req, res){
     const {
         device_id,
+        nombre,
         temperatura,
         humedadAmbiente,
         humedadSuelo,
@@ -13,15 +14,11 @@ export async function sensorData(req, res){
     } = req.body;
 
     try {
-        
-        const result = await insertSensorData(device_id, 
-            temperatura,
-            humedadAmbiente,
-            humedadSuelo,
-            luz);
+        const id = await searchForSensorByName(nombre);
+        const result = await insertSensorData(id, temperatura, humedadAmbiente, humedadSuelo, luz);
         
         res.json({
-            message: result
+            message: "Si funciono" //Cambiar message
         });
 
     } catch(err){
