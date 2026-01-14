@@ -36,11 +36,11 @@ export async function durationCrop(req, res){
 export async function addSensor(req, res){
     const {
         idUsuario,
-        ip
+        name
     } = req.body;
 
     try {
-        const result = await insertSensor(idUsuario, ip);
+        const result = await insertSensor(idUsuario, name);
 
         res.json({
             idSensor: result
