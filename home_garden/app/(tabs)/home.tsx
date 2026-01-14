@@ -17,6 +17,7 @@ export default function Home() {
     const [modalBluetoothVisible, setModalBluetoothVisible] = useState(false);
     const [modalWifiVisible, setModalWifiVisible] = useState(false);
 
+    const [deviceName, setDeviceName] = useState<string | null>("");
     const [ssid, setSsid] = useState("");
     const [password, setPassword] = useState<string>("");
 
@@ -72,7 +73,7 @@ export default function Home() {
                     },
                     body: JSON.stringify({
                         idUsuario: 1, //Cambiar al id del usuario
-                        ip: "1.2.3.4", // Revisando si quitar o dejar
+                        name: deviceName, // Revisando si quitar o dejar
                     }),
                 });
                 const data = await response.json();
@@ -106,6 +107,7 @@ export default function Home() {
                     <MaterialIcons name="add" size={28} color="#f9f9f9"/>
                 </TouchableOpacity>
                 { modalBluetoothVisible && (<ModalSensor
+                    setDeviceName={setDeviceName}
                     items={allDevices}
                     isVisible={modalBluetoothVisible}
                     connectedToPeripheral={connectToDevice}
