@@ -3,8 +3,14 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 #include <WiFi.h>
+#include <DHT.h>
+#include <HTTPClient.h>
 
 Preferences prefs;
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+#define soil_moisture_pin 33
 
 #define WIFI_SERVICE_UUID "e72640a5-7d6f-401a-b506-8355a871f404"
 #define WIFI_SSID_CHAR_UUID "92f0538e-66f2-48f4-bf43-94e3d3fdf475"
@@ -14,6 +20,36 @@ String deviceName;
 
 String receivedSSID;
 String receivedPassword;
+const char* serverUrl = "http://192.168.3.5:8080/sensorData";
+
+DHT dht(DHTPIN, DHTTYPE);
+
+unsigned long lastTime = 0;
+const unsigned long interval = 6000;
+
+/*
+  Struct
+*/
+
+struct Sensors {
+  float humidity;
+  float temperature;
+  int soilMoisture;
+};
+
+/*
+  Variables de ultimo valor del sensor y Umbral
+*/
+
+float lastValueHumidity = 0.0;
+float lastValueTemperature = 0.0;
+float lastValueLux = 0.0;
+int lastValueSoilMoisture = 0.0;
+
+float umbralHumidity = 10.0;
+float umbralTemperature = 5.0;
+float umbralLight = 20.0; // Medidos en LUX
+int umbralSoilMoisture = 15.0;
 
 /*
   Generar nombre del esp32
@@ -139,12 +175,79 @@ void setupBluetooth() {
   BLEDevice::startAdvertising();
 }
 
+/*
+  Sensor DHT11 - Humedad y Temperatura.
+  Sensor YL-69 - Humeadad de la Tierra.
+*/
+
+Sensors readSensors(){
+  Sensors s;
+
+  s.humidity = dht.readHumidity();
+  s.temperature = dht.readTemperature();
+
+  /*if (isnan(s.humidity) || isnan(s.temperature)){
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }*/
+
+  s.soilMoisture = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
+
+  return s;
+
+}
+
+/*
+  Guardar registros en la base de datos.
+*/
+
+void saveData(float temperature,float humedity, int soil_moisture, String light){
+  if(WiFi.status() == WL_CONNECTED){
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+
+    String json = "{";
+    json += "\"device_id\":\"esp32_1\",";
+    json += "\"nombre\":\"" + deviceName + "\",";
+    json += "\"temperatura\":" + String(temperature) + ",";
+    json += "\"humedadAmbiente\":" + String(humedity) + ",";
+    json += "\"humedadSuelo\":" + String(soil_moisture) + ",";
+    json += "\"luz\":\"" + light + "\"}";
+
+    int httpCode = http.POST(json);
+    http.end();
+  }
+
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
   saveConfig();
-}
+
+  pinMode(soil_moisture_pin, INPUT);
+  dht.begin();
+} 
 
 void loop() {
+
+  Sensors value = readSensors();
+
+  bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
+  bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
+  //Falta cambio de luz
+  bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
+
+  if(millis() - lastTime >= interval | changeHumidity){
+    
+    saveData(value.temperature, value.humidity, value.soilMoisture, "bajo");
+
+    lastTime = millis();
+    lastValueHumidity = value.humidity;
+    lastValueTemperature = value.temperature;
+    //Falta guardar el ultimo valor de luz
+    lastValueSoilMoisture = value.soilMoisture;
+  }
 
 }

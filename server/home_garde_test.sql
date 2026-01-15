@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS cultivo (
 CREATE TABLE IF NOT EXISTS sensor(
     idSensor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idUsuario INT NOT NULL,
-    ip VARCHAR(15) NOT NULL,
-    FOREIGN KEY(idUsuario) REFERENCES usuario(id)
+    deviceName VARCHAR(20) NOT NULL,
+    FOREIGN KEY(idUsuario) REFERENCES usuario(id),
 );
 
 CREATE TABLE IF NOT EXISTS huerto (
@@ -40,6 +40,18 @@ CREATE TABLE IF NOT EXISTS huerto (
     fechaFin DATE,
     FOREIGN KEY(idSensor) REFERENCES sensor(idSensor),
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
+);
+
+CREATE TABLE IF NOT EXISTS sensor_data(
+    idSensorData INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idSensor INT NOT NULL,
+    temperatura FLOAT NOT NULL,
+    humedadAmbiente FLOAT NOT NULL,
+    humedadSuelo FLOAT NOT NULL,
+    luz CHAR(10) NOT NULL,
+    fecha DATE DEFAULT CURDATE(),
+    hora TIME DEFAULT CURTIME(),
+    FOREIGN KEY(idSensor) REFERENCES sensor(idSensor)
 );
 
 /*
