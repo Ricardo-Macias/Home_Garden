@@ -24,6 +24,33 @@ const char* serverUrl = "http://192.168.3.5:8080/sensorData";
 
 DHT dht(DHTPIN, DHTTYPE);
 
+unsigned long lastTime = 0;
+const unsigned long interval = 6000;
+
+/*
+  Struct
+*/
+
+struct Sensors {
+  float humidity;
+  float temperature;
+  int soilMoisture;
+};
+
+/*
+  Variables de ultimo valor del sensor y Umbral
+*/
+
+float lastValueHumidity = 0.0;
+float lastValueTemperature = 0.0;
+float lastValueLux = 0.0;
+int lastValueSoilMoisture = 0.0;
+
+float umbralHumidity = 10.0;
+float umbralTemperature = 5.0;
+float umbralLight = 20.0; // Medidos en LUX
+int umbralSoilMoisture = 15.0;
+
 /*
   Generar nombre del esp32
 */
@@ -153,22 +180,16 @@ void setupBluetooth() {
   Sensor YL-69 - Humeadad de la Tierra.
 */
 
-struct Sensors {
-  float humidity;
-  float temperature;
-  int soilMoisture;
-}
-
 Sensors readSensors(){
-  Sensor s;
+  Sensors s;
 
   s.humidity = dht.readHumidity();
   s.temperature = dht.readTemperature();
 
-  if (isnan(s.humidity) || isnan(s.temperature)){
+  /*if (isnan(s.humidity) || isnan(s.temperature)){
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
-  }
+  }*/
 
   s.soilMoisture = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
 
@@ -210,9 +231,23 @@ void setup() {
 } 
 
 void loop() {
-  
+
   Sensors value = readSensors();
 
-  saveData(1.0, 1.0, 1, "bajo");
-  delay(5000);
+  bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
+  bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
+  //Falta cambio de luz
+  bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
+
+  if(millis() - lastTime >= interval | changeHumidity){
+    
+    saveData(value.temperature, value.humidity, value.soilMoisture, "bajo");
+
+    lastTime = millis();
+    lastValueHumidity = value.humidity;
+    lastValueTemperature = value.temperature;
+    //Falta guardar el ultimo valor de luz
+    lastValueSoilMoisture = value.soilMoisture;
+  }
+
 }
