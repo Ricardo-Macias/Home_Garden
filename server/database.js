@@ -74,6 +74,7 @@ export async function deleteUser(id) {
 /*
  * Consultas de perfil
 */
+
  // PERFIL: obtener datos del usuario + historial de huertos
 export async function getUserProfile(idUsuario) {
     // Datos básicos del usuario
@@ -86,7 +87,7 @@ export async function getUserProfile(idUsuario) {
 
     if (!userRows[0]) return null;
 
-    // Historial desde la vista (usa idUsuario, no usuario_id)
+    // Historial desde la vista (usa idUsuario)
     const [historialRows] = await pool.query(
         `SELECT * FROM vista_historial_huertos WHERE idUsuario = ?`,
         [idUsuario]
