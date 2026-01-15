@@ -150,33 +150,30 @@ void setupBluetooth() {
 
 /*
   Sensor DHT11 - Humedad y Temperatura.
-*/
-
-void temperatureAndHumidity(){
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
-
-  if (isnan(humidity) || isnan(temperature)){
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-  }
-  Serial.print(F("Humedad: "));
-  Serial.print(humidity);
-  Serial.print(F("% Temperatura: "));
-  Serial.print(temperature);
-  Serial.println(F("°C "));
-}
-
-/*
   Sensor YL-69 - Humeadad de la Tierra.
 */
 
-void soilMoisture(){
-  int sensorValue = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
-  Serial.print("Humedad del suelo: ");
-  Serial.print(sensorValue);
-  Serial.println(" %");
-  delay(1000);
+struct Sensors {
+  float humidity;
+  float temperature;
+  int soilMoisture;
+}
+
+Sensors readSensors(){
+  Sensor s;
+
+  s.humidity = dht.readHumidity();
+  s.temperature = dht.readTemperature();
+
+  if (isnan(s.humidity) || isnan(s.temperature)){
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  s.soilMoisture = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
+
+  return s;
+
 }
 
 /*
@@ -213,9 +210,9 @@ void setup() {
 } 
 
 void loop() {
+  
+  Sensors value = readSensors();
+
   saveData(1.0, 1.0, 1, "bajo");
-  Serial.println("Se mandaron los datos");
   delay(5000);
-  //temperatureAndHumidity();
-  //soilMoisture();
 }
