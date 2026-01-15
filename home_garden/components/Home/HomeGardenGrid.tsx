@@ -9,7 +9,7 @@ import {
     Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { formatDate } from "@/components/formatDate";
+import { formatDate } from "@/components/utils/formatDate";
 import Constants from "expo-constants";
 
 const { width } = Dimensions.get("window");

@@ -8,7 +8,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { formatDate } from "@/components/formatDate";
+import { formatDate } from "@/components/utils/formatDate";
 
 export default function GardenDetail() {
     const params = useLocalSearchParams();
