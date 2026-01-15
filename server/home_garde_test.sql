@@ -25,12 +25,12 @@ CREATE TABLE IF NOT EXISTS sensor(
     idSensor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idUsuario INT NOT NULL,
     ip VARCHAR(15) NOT NULL,
-    FOREIGN KEY(idUsuario) REFERENCES usuario(id),
+    FOREIGN KEY(idUsuario) REFERENCES usuario(id)
 );
 
 CREATE TABLE IF NOT EXISTS huerto (
 	idHuerto INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    idSensorWifi INT NOT NULL,
+    idSensor INT NOT NULL,
     idCultivo INT NOT NULL,
     nombre VARCHAR(80),
     estado BOOLEAN,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS huerto (
     fechaInicio DATE NOT NULL,
     fechaEstimada DATE,
     fechaFin DATE,
-    FOREIGN KEY(idSensorWifi) REFERENCES sensorWifi(idSensorWifi),
+    FOREIGN KEY(idSensor) REFERENCES sensor(idSensor),
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
 );
 
@@ -60,3 +60,18 @@ CREATE VIEW vw_home AS
     JOIN sensor s ON h.idSensor = s.idSensor
     JOIN USUARIO u ON u.id = s.idUsuario
     AND estado = 0;
+
+
+CREATE VIEW vsta_historial_huerto AS
+    SELECT 
+        h.imagen AS imagen,
+        h.nombre AS huerto,
+        c.nombre AS cultivo,
+        h.fechaInicio AS inicio,
+        h.fechaEstimada AS estimada,
+        c.dificultad AS dificultad,
+        c.tipo AS tipo,
+        c.duracion AS duracion
+    FROM huerto h
+    JOIN cultivo c ON h.idCultivo = c.id
+    WHERE h.estado = 1;

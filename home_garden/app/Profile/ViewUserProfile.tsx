@@ -28,21 +28,22 @@ export default function Viewprofile() {
     }, [user]);
 
     if (loading) {
-        return <ActivityIndicator size="large" style={{ marginTop: 40}} />;
+        return <ActivityIndicator size="large" style={{ marginTop: 40 }} />;
     }
 
     if (!profile) {
-        return <Text>No se pudo cargar el perfil</Text>
+        return <Text>No se pudo cargar el perfil</Text>;
     }
 
     return (
         <View style={styles.container}>
             <ComponentsProfile
-                nombre={profile.nombre}
-                apellidos={profile.apellidos}
-                correo={profile.correo}
+                nombre={profile.nombre ?? ""} 
+                apellidos={profile.apellidos ?? ""}
+                correo={profile.correo ?? ""}
             />
-            <ComponentsHistory historial={profile.historial} />
+
+            <ComponentsHistory historial={profile.historial ?? []} />
         </View>
     );
 }
