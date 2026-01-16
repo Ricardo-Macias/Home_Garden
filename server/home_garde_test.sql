@@ -73,17 +73,21 @@ CREATE VIEW vw_home AS
     JOIN USUARIO u ON u.id = s.idUsuario
     AND estado = 0;
 
-
-CREATE VIEW vsta_historial_huerto AS
-    SELECT 
-        h.imagen AS imagen,
+--- Corregir 
+CREATE VIEW vista_historial_huertos AS
+    SELECT
+        u.id AS idUsuario,
+        h.idHuerto AS idHuerto,
         h.nombre AS huerto,
         c.nombre AS cultivo,
-        h.fechaInicio AS inicio,
-        h.fechaEstimada AS estimada,
-        c.dificultad AS dificultad,
         c.tipo AS tipo,
+        c.dificultad AS dificultad,
         c.duracion AS duracion
+        h.imagen AS imagen,
+        h.fechaInicio AS fechaInicio,
+        h.fechaEstimada AS fechaFin
     FROM huerto h
+    JOIN sensor s ON h.idSensor = s.idSensor
+    JOIN usuario u ON s.idUsuario = u.id
     JOIN cultivo c ON h.idCultivo = c.id
     WHERE h.estado = 1;
