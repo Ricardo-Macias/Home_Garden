@@ -25,7 +25,9 @@ const char* serverUrl = "http://192.168.3.5:8080/sensorData";
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long lastTime = 0;
-const unsigned long interval = 6000;
+const unsigned long interval = 300000; // 5 Minutos
+unsigned long lastReadingTime = 0;
+const unsigned long readingInterval = 2000;
 
 /*
   Struct
@@ -231,23 +233,34 @@ void setup() {
 } 
 
 void loop() {
+  if(millis() - lastReadingTime >= readingInterval){
+    Sensors value = readSensors();
 
-  Sensors value = readSensors();
+    bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
+    bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
+    //Falta cambio de luz
+    bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
 
-  bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
-  bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
-  //Falta cambio de luz
-  bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
+    if(millis() - lastTime >= interval || changeSoilMoisture){
+      
+      //saveData(value.temperature, value.humidity, value.soilMoisture, "bajo");
+      Serial.println("Pasaron 5 minutos o Sucedio un cambio brusco");
+      Serial.print("Valores del DHT11: ");
+      Serial.print(value.temperature);
+      Serial.print("°C ");
+      Serial.print("Humedad: ");
+      Serial.print(value.humidity);
+      Serial.println("%");
+      Serial.print("Valor del sensor: ");
+      Serial.print(value.soilMoisture);
+      Serial.println("% ");
 
-  if(millis() - lastTime >= interval | changeHumidity){
-    
-    saveData(value.temperature, value.humidity, value.soilMoisture, "bajo");
-
-    lastTime = millis();
-    lastValueHumidity = value.humidity;
-    lastValueTemperature = value.temperature;
-    //Falta guardar el ultimo valor de luz
-    lastValueSoilMoisture = value.soilMoisture;
+      lastTime = millis();
+      lastValueHumidity = value.humidity;
+      lastValueTemperature = value.temperature;
+      //Falta guardar el ultimo valor de luz
+      lastValueSoilMoisture = value.soilMoisture;
+    }
+    lastReadingTime = millis();
   }
-
 }
