@@ -5,8 +5,11 @@
 #include <WiFi.h>
 #include <DHT.h>
 #include <HTTPClient.h>
+#include <Wire.h>
+#include <BH1750.h>
 
 Preferences prefs;
+BH1750 lightMeter;
 
 #define DHTPIN 4
 #define DHTTYPE DHT11
@@ -37,6 +40,7 @@ struct Sensors {
   float humidity;
   float temperature;
   int soilMoisture;
+  float lux;
 };
 
 /*
@@ -180,6 +184,7 @@ void setupBluetooth() {
 /*
   Sensor DHT11 - Humedad y Temperatura.
   Sensor YL-69 - Humeadad de la Tierra.
+  Sensor BH1750 - Lux
 */
 
 Sensors readSensors(){
@@ -194,6 +199,7 @@ Sensors readSensors(){
   }*/
 
   s.soilMoisture = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
+  s.lux = lightMeter.readLightLevel();
 
   return s;
 
@@ -230,6 +236,10 @@ void setup() {
 
   pinMode(soil_moisture_pin, INPUT);
   dht.begin();
+
+  Wire.begin();
+  lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE);
+
 } 
 
 void loop() {
@@ -238,7 +248,7 @@ void loop() {
 
     bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
     bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
-    //Falta cambio de luz
+    bool changeLux = abs(value.lux - lastValueLux) >= umbralLight;
     bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
 
     if(millis() - lastTime >= interval || changeSoilMoisture){
@@ -254,11 +264,14 @@ void loop() {
       Serial.print("Valor del sensor: ");
       Serial.print(value.soilMoisture);
       Serial.println("% ");
+      Serial.print("Luz: ");
+      Serial.print(value.lux);
+      Serial.println(" lx");
 
       lastTime = millis();
       lastValueHumidity = value.humidity;
       lastValueTemperature = value.temperature;
-      //Falta guardar el ultimo valor de luz
+      lastValueLux = value.lux;
       lastValueSoilMoisture = value.soilMoisture;
     }
     lastReadingTime = millis();
