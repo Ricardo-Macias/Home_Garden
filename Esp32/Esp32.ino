@@ -7,6 +7,7 @@
 #include <HTTPClient.h>
 #include <Wire.h>
 #include <BH1750.h>
+#include "api.h"
 
 Preferences prefs;
 BH1750 lightMeter;
@@ -23,7 +24,7 @@ String deviceName;
 
 String receivedSSID;
 String receivedPassword;
-const char* serverUrl = "http://192.168.3.5:8080/sensorData";
+const char* serverUrl = API;
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -209,7 +210,7 @@ Sensors readSensors(){
   Guardar registros en la base de datos.
 */
 
-void saveData(float temperature,float humedity, int soil_moisture, String light){
+void saveData(float temperature,float humedity, int soil_moisture, float light){
   if(WiFi.status() == WL_CONNECTED){
     HTTPClient http;
     http.begin(serverUrl);
@@ -221,7 +222,7 @@ void saveData(float temperature,float humedity, int soil_moisture, String light)
     json += "\"temperatura\":" + String(temperature) + ",";
     json += "\"humedadAmbiente\":" + String(humedity) + ",";
     json += "\"humedadSuelo\":" + String(soil_moisture) + ",";
-    json += "\"luz\":\"" + light + "\"}";
+    json += "\"luz\":" + String(light) + "}";
 
     int httpCode = http.POST(json);
     http.end();
@@ -237,8 +238,8 @@ void setup() {
   pinMode(soil_moisture_pin, INPUT);
   dht.begin();
 
-  Wire.begin();
-  lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE);
+  Wire.begin(21, 22);
+  lightMeter.begin();
 
 } 
 
