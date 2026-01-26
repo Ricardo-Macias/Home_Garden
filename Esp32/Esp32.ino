@@ -5,8 +5,12 @@
 #include <WiFi.h>
 #include <DHT.h>
 #include <HTTPClient.h>
+#include <Wire.h>
+#include <BH1750.h>
+#include "api.h"
 
 Preferences prefs;
+BH1750 lightMeter;
 
 #define DHTPIN 4
 #define DHTTYPE DHT11
@@ -20,12 +24,14 @@ String deviceName;
 
 String receivedSSID;
 String receivedPassword;
-const char* serverUrl = "http://192.168.3.5:8080/sensorData";
+const char* serverUrl = API;
 
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long lastTime = 0;
-const unsigned long interval = 6000;
+const unsigned long interval = 300000; // 5 Minutos (300000)
+unsigned long lastReadingTime = 0;
+const unsigned long readingInterval = 2000;
 
 /*
   Struct
@@ -35,6 +41,7 @@ struct Sensors {
   float humidity;
   float temperature;
   int soilMoisture;
+  float lux;
 };
 
 /*
@@ -178,6 +185,7 @@ void setupBluetooth() {
 /*
   Sensor DHT11 - Humedad y Temperatura.
   Sensor YL-69 - Humeadad de la Tierra.
+  Sensor BH1750 - Lux
 */
 
 Sensors readSensors(){
@@ -192,6 +200,7 @@ Sensors readSensors(){
   }*/
 
   s.soilMoisture = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
+  s.lux = lightMeter.readLightLevel();
 
   return s;
 
@@ -201,7 +210,7 @@ Sensors readSensors(){
   Guardar registros en la base de datos.
 */
 
-void saveData(float temperature,float humedity, int soil_moisture, String light){
+void saveData(float temperature,float humedity, int soil_moisture, float light){
   if(WiFi.status() == WL_CONNECTED){
     HTTPClient http;
     http.begin(serverUrl);
@@ -213,7 +222,7 @@ void saveData(float temperature,float humedity, int soil_moisture, String light)
     json += "\"temperatura\":" + String(temperature) + ",";
     json += "\"humedadAmbiente\":" + String(humedity) + ",";
     json += "\"humedadSuelo\":" + String(soil_moisture) + ",";
-    json += "\"luz\":\"" + light + "\"}";
+    json += "\"luz\":" + String(light) + "}";
 
     int httpCode = http.POST(json);
     http.end();
@@ -228,26 +237,31 @@ void setup() {
 
   pinMode(soil_moisture_pin, INPUT);
   dht.begin();
+
+  Wire.begin(21, 22);
+  lightMeter.begin();
+
 } 
 
 void loop() {
+  if(millis() - lastReadingTime >= readingInterval){
+    Sensors value = readSensors();
 
-  Sensors value = readSensors();
+    bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
+    bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
+    bool changeLux = abs(value.lux - lastValueLux) >= umbralLight;
+    bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
 
-  bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
-  bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
-  //Falta cambio de luz
-  bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
+    if(millis() - lastTime >= interval || changeSoilMoisture || changeTemperature || changeHumidity || changeLux){
+      
+      saveData(value.temperature, value.humidity, value.soilMoisture, value.lux);
 
-  if(millis() - lastTime >= interval | changeHumidity){
-    
-    saveData(value.temperature, value.humidity, value.soilMoisture, "bajo");
-
-    lastTime = millis();
-    lastValueHumidity = value.humidity;
-    lastValueTemperature = value.temperature;
-    //Falta guardar el ultimo valor de luz
-    lastValueSoilMoisture = value.soilMoisture;
+      lastTime = millis();
+      lastValueHumidity = value.humidity;
+      lastValueTemperature = value.temperature;
+      lastValueLux = value.lux;
+      lastValueSoilMoisture = value.soilMoisture;
+    }
+    lastReadingTime = millis();
   }
-
 }

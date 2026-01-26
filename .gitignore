@@ -51,3 +51,6 @@ app-example
 
 # Image
 /server/uploads
+
+#esp32
+api.h
