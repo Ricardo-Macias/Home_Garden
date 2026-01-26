@@ -29,7 +29,7 @@ const char* serverUrl = API;
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long lastTime = 0;
-const unsigned long interval = 300000; // 5 Minutos
+const unsigned long interval = 300000; // 5 Minutos (300000)
 unsigned long lastReadingTime = 0;
 const unsigned long readingInterval = 2000;
 
@@ -252,22 +252,9 @@ void loop() {
     bool changeLux = abs(value.lux - lastValueLux) >= umbralLight;
     bool changeSoilMoisture = abs(value.soilMoisture - lastValueSoilMoisture) >= umbralSoilMoisture;
 
-    if(millis() - lastTime >= interval || changeSoilMoisture){
+    if(millis() - lastTime >= interval || changeSoilMoisture || changeTemperature || changeHumidity || changeLux){
       
-      //saveData(value.temperature, value.humidity, value.soilMoisture, "bajo");
-      Serial.println("Pasaron 5 minutos o Sucedio un cambio brusco");
-      Serial.print("Valores del DHT11: ");
-      Serial.print(value.temperature);
-      Serial.print("°C ");
-      Serial.print("Humedad: ");
-      Serial.print(value.humidity);
-      Serial.println("%");
-      Serial.print("Valor del sensor: ");
-      Serial.print(value.soilMoisture);
-      Serial.println("% ");
-      Serial.print("Luz: ");
-      Serial.print(value.lux);
-      Serial.println(" lx");
+      saveData(value.temperature, value.humidity, value.soilMoisture, value.lux);
 
       lastTime = millis();
       lastValueHumidity = value.humidity;
