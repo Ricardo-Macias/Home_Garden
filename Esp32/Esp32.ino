@@ -55,7 +55,7 @@ int lastValueSoilMoisture = 0.0;
 
 float umbralHumidity = 10.0;
 float umbralTemperature = 5.0;
-float umbralLight = 20.0; // Medidos en LUX
+float umbralLight = 40.0; // Medidos en LUX
 int umbralSoilMoisture = 15.0;
 
 /*

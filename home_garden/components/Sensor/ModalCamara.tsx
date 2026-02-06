@@ -55,7 +55,7 @@ export default function ModalCamara({ setImage, isVisible, onClose}: Props){
                 });
                 
                 const data = await response.json();
-                setImage(`${config.API_URL}/uploads/${data.filename}`);
+                setImage(data.filename); //`${config.API_URL}/uploads/${data.filename}`
                 setUrl(null);
                 onClose();
             } catch(err){

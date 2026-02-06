@@ -133,7 +133,7 @@ export default function FormSensor(){
                 throw new Error(data.message || "Error al registrar");
             }
 
-            Alert.alert("Exito", "Usuario registrado correctamente");
+            Alert.alert("Exito", "Sensor registrado correctamente");
 
         } catch(err: any){
             Alert.alert("Error", err.message);

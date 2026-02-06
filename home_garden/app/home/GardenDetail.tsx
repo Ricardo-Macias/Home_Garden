@@ -5,19 +5,49 @@ import {
     StyleSheet,
     ScrollView,
 } from "react-native";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDate } from "@/components/utils/formatDate";
+import Constants from "expo-constants";
+
+interface AppConfig{
+    API_URL: string;
+}
+const config = Constants.expoConfig?.extra as AppConfig;
+
+type valueSensor = {
+    temperature: number;
+    humedity: number;
+    soilMoisture: number;
+    light: number;
+}
 
 export default function GardenDetail() {
     const params = useLocalSearchParams();
+    const [sensorData, setSensorData] = useState<valueSensor | null>(null);
 
+    const sensor = Number(params.sensor ?? "");
     const huerto = String(params.huerto ?? "");
     const cultivo = String(params.cultivo ?? "");
     const imageUrl = String(params.imagen ?? "https://via.placeholder.com/400");
     const inicio = String(params.inicio ?? "");
     const termina = String(params.termina ?? "");
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`${config.API_URL}/getSensorData/${sensor}`);
+                const data = await response.json();
+                setSensorData(data);
+            } catch (error) {
+                console.log("Error al cargar los datos de los sensores: ", error);
+            }
+        };
+
+        fetchData();
+    });
 
     return (
         <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
@@ -59,10 +89,10 @@ export default function GardenDetail() {
 
                 {/* Grid sensores */}
                 <View style={styles.grid}>
-                    <SensorCard icon="thermometer" label="Temp" value="23 °C" color="#F44336" />
-                    <SensorCard icon="weather-sunny" label="Luz" value="Media" color="#FFC107" />
-                    <SensorCard icon="water-percent" label="Hum. Amb" value="62 %" color="#03A9F4" />
-                    <SensorCard icon="sprout" label="Hum. Suelo" value="41 %" color="#4CAF50" />
+                    <SensorCard icon="thermometer" label="Temp" value={ sensorData?.temperature + " °C"} color="#F44336" />
+                    <SensorCard icon="weather-sunny" label="Luz" value={sensorData?.light} color="#FFC107" />
+                    <SensorCard icon="water-percent" label="Hum. Amb" value={sensorData?.humedity + " %"} color="#03A9F4" />
+                    <SensorCard icon="sprout" label="Hum. Suelo" value={sensorData?.soilMoisture + " %"} color="#4CAF50" />
                 </View>
             </ScrollView>
         </SafeAreaView>

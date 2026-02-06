@@ -133,12 +133,25 @@ export async function insertSensor(idUsuario, name) {
     return sensorID;
 }
 
+/*
+ *  Consultas en la tabla de sensor_data 
+ */
+
 export async function insertSensorData(idSensor, temperature, humedity, soilMoisture, light){
     const [result] = await pool.query(
         `INSERT INTO sensor_data (idSensor, temperatura, humedadAmbiente, humedadSuelo, luz) VALUES (?, ?, ?, ?, ?)`,
         [idSensor, temperature, humedity, soilMoisture, light]
     );
     
+    return result;
+}
+
+export async function lastValueRecordedSensorData(idSensor){
+    const [result] = await pool.query(
+        `SELECT * FROM sensor_data WHERE idSensor = ? ORDER BY idSensorData DESC LIMIT 1`,
+        [idSensor]
+    );
+
     return result;
 }
 

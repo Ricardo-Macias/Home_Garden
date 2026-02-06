@@ -73,7 +73,6 @@ CREATE VIEW vw_home AS
     JOIN USUARIO u ON u.id = s.idUsuario
     AND estado = 0;
 
---- Corregir 
 CREATE VIEW vista_historial_huertos AS
     SELECT
         u.id AS idUsuario,
