@@ -33,7 +33,8 @@ import {
 } from "./controllers/cropController.js"
 
 import {
-    sensorData
+    sensorData,
+    getSensorData
 } from "./controllers/sensorController.js"
 
 const corsOptions = {
@@ -109,10 +110,11 @@ app.post("/upload", upload.single("image"), (req, res) => {
 });
 
 /*
-    Subir datos de los sensores
+    Datos de los sensores
 */
 
 app.post("/sensorData", sensorData);
+app.get("/getSensorData/:idSensor", getSensorData);
 
 /**
  * PERFIL

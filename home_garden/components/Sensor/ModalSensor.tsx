@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Device } from "react-native-ble-plx";
+import MessageBox from "@/components/MessageBox"
+import { BleManager } from "react-native-ble-plx";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
     setDeviceName: React.Dispatch<React.SetStateAction<string | null>>;
@@ -21,7 +24,9 @@ type Props = {
     onClose: () => void;
 };
 
-export default function ModalSensor({setDeviceName, items, isVisible, children, connectedToPeripheral, goToConnectedWifi, onClose }: Props){
+export default function ModalSensor({setDeviceName, items, isVisible, children, connectedToPeripheral, goToConnectedWifi,onClose }: Props){
+    const manager = useMemo(() => new BleManager(), []);
+    const [poweredOn, setPoweredOn] = useState<boolean>();
 
     const connectAndClosedModal = async (device: Device) => {
         connectedToPeripheral(device);
@@ -29,6 +34,19 @@ export default function ModalSensor({setDeviceName, items, isVisible, children, 
         onClose();
         goToConnectedWifi();
     }
+
+    useEffect(() => {
+        const subscription = manager.onStateChange((state) =>{
+            console.log("Estado del Bluetooth:", state);
+            if (state === 'PoweredOn'){
+                setPoweredOn(true)
+            } else if(state === 'PoweredOff'){
+                setPoweredOn(false);
+            }
+        }, true);
+
+        return () => subscription.remove();
+    }, [manager]);
 
     return (
         <Modal animationType="slide" transparent={true} visible={isVisible}>
@@ -42,7 +60,7 @@ export default function ModalSensor({setDeviceName, items, isVisible, children, 
                     </TouchableOpacity>
                 </View>
                 {children}
-                <View style={styles.sensorsContainer}>
+                {poweredOn ? (<View style={styles.sensorsContainer}>
                     <FlatList 
                     data={items}
                     keyExtractor={(item) => item.id}
@@ -56,7 +74,12 @@ export default function ModalSensor({setDeviceName, items, isVisible, children, 
                         </View>
                     )}
                     />
-                </View>
+                </View>) :
+                <MessageBox
+                    type="info"
+                    message="El bluetooth esta desactivado">
+                </MessageBox> 
+                }
             </View>
         </Modal>
     )
