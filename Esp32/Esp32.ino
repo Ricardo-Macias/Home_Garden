@@ -15,6 +15,8 @@ BH1750 lightMeter;
 #define DHTPIN 4
 #define DHTTYPE DHT11
 #define soil_moisture_pin 33
+#define soil_moisture_pin_2 34
+#define soil_moisture_pin_3 35
 
 #define WIFI_SERVICE_UUID "e72640a5-7d6f-401a-b506-8355a871f404"
 #define WIFI_SSID_CHAR_UUID "92f0538e-66f2-48f4-bf43-94e3d3fdf475"
@@ -41,6 +43,8 @@ struct Sensors {
   float humidity;
   float temperature;
   int soilMoisture;
+  int soilMoisture_2;
+  int soilMoisture_3;
   float lux;
 };
 
@@ -200,6 +204,8 @@ Sensors readSensors(){
   }*/
 
   s.soilMoisture = map(analogRead(soil_moisture_pin), 4092, 0, 0, 100);
+  s.soilMoisture_2 = map(analogRead(soil_moisture_pin_2), 4092, 0, 0, 100);
+  s.soilMoisture_3 = map(analogRead(soil_moisture_pin_3), 4092, 0, 0, 100);
   s.lux = lightMeter.readLightLevel();
 
   return s;
@@ -236,6 +242,8 @@ void setup() {
   saveConfig();
 
   pinMode(soil_moisture_pin, INPUT);
+  pinMode(soil_moisture_pin_2, INPUT);
+  pinMode(soil_moisture_pin_3, INPUT);
   dht.begin();
 
   Wire.begin(21, 22);
