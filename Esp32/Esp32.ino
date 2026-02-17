@@ -184,6 +184,72 @@ void setupBluetooth() {
 }
 
 /*
+  Control difuso - Sugeno
+*/
+
+float triangular(float x, float a, float b, float c) {
+  if (x <= a || x >= c) return 0;
+  if (x == b) return 1;
+  if (x < b) return (x - a) / (b - a);
+  return (c - x) / (c - b); 
+}
+
+float trapezoidal(float x, float a, float b, float c, float d){
+  if (x <= a || x >= d) return 0;
+  if (x >= b && x <= c) return 1;
+  if (x < b) return (x - a) / (b - a);
+  return (d - x) / (d - c);
+}
+
+float sugeno(float hum, float temp, float luz){
+  
+  float seco = trapezoidal(humedad, 0, 0, 30, 37);
+  float optimo = triangular(humedad, 40, 42, 47);
+  float saturado = trapezoidal(humedad, 47, 55, 100, 100);
+
+  float tempBaja = trapezoidal(temp, 0, 0, 10, 15);
+  float tempAlta = trapezoidal(temp, 20, 26, 40, 40);
+
+  float luzBaja = trapezoidal(luz, 0, 0, 500, 2500);
+  float luzAlta = trapezoidal(luz, 1500, 5000, 65535, 65535);
+
+  float humedadAmbienteBaja = trapezoidal(humedadAmbiente, 0, 0, 20, 30);
+  float humedadAmbienteAlta = trapezoidal(humedadAmbiente, 58, 60, 100, 100);
+  
+  //Reglas (peso = min)
+
+  float w1 = min(seco, min(tempAlta, min(luzAlta, humedadAmbienteBaja)));
+  float w2 = min(seco, min(tempAlta, min(luzAlta, humedadAmbienteAlta)));
+  float w3 = min(seco, min(tempBaja, min(humedadAmbienteBaja, luzAlta)));
+  float w4 = min(seco, min(tempBaja, humedadAmbienteAlta));
+  float w5 = min(optimo, luzAlta);
+  float w6 = min(optimo, tempAlta);
+  float w7 = min(optimo, tempBaja);
+  float w8 = saturado;
+
+  // Salidas constantes
+
+  float z1 = 140;
+  float z2 = 120;
+  float z3 = 100;
+  float z4 = 90;
+  float z5 = 50;
+  float z6 = 10;
+  float z7 = 0;
+  float z8 = 0;
+
+  // Promedio ponderado
+
+  float numerador = (w1 * z1) + (w2 * z2) + (w3 * z3) + (w4 * z4) + (w5 * z5) + (w6 * z6) + (w7 * z7 ) + (w8 * z8);
+
+  float denominador = w1 + w2 + w3 + w4 + w5 + w6 + w7 + w8;
+  if (denominador == 0) return 0;
+
+  return numerador / denominador; 
+
+}
+
+/*
   Sensor DHT11 - Humedad y Temperatura.
   Sensor YL-69 - Humeadad de la Tierra.
   Sensor BH1750 - Lux
@@ -202,12 +268,6 @@ Sensors readSensors(){
 
   s.soilMoisture = map(analogRead(soil_moisture_pin), 4095, 0, 0, 100);
   s.lux = lightMeter.readLightLevel();
-
-  if (s.soilMoisture <= 60) {
-    digitalWrite(SLAVE, LOW);
-  } else if (s.soilMoisture > 60) {
-    digitalWrite(SLAVE, HIGH);
-  }
 
   return s;
 
@@ -248,13 +308,11 @@ void setup() {
 
   Wire.begin(21, 22);
   lightMeter.begin();
-
 } 
 
 void loop() {
   
   if(millis() - lastReadingTime >= readingInterval){
-    Sensors value = readSensors();
 
     bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
     bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
