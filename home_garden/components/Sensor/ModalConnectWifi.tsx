@@ -80,7 +80,7 @@ export default function ModalConnectWifi({
                     <ScrollView
                         contentContainerStyle={{
                             flexGrow: 1,
-                            paddingBottom: keyboardHeight, // 🔥 ajuste dinámico
+                            paddingBottom: keyboardHeight, 
                         }}
                         keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
