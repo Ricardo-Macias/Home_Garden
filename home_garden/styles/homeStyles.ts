@@ -1,138 +1,132 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { colors } from "../styles/colors";
+import { colors } from "./colors";
 
 const { width } = Dimensions.get("window");
 
-export default StyleSheet.create({
+const homeStyle = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "transparent",
-        padding: 16,
+        paddingHorizontal: 16,
+        paddingTop: 20,
     },
 
-    // Encabezado
-    headerContainer: {
-        paddingHorizontal: 24,
-        paddingTop: 50,
-    },
-    greeting: {
-        fontSize: 22,
-        fontWeight: "bold",
-        color: colors.primary,
-        position: "relative",
-    },
     subtitle: {
-        fontSize: 19,
+        fontSize: 20,
         fontWeight: "bold",
-        color: colors.primary,
-        padding: 12,
-    },
-    date: {
-        fontSize: 16,
-        color: colors.textSecondary,
-        marginBottom: 20,
+        marginBottom: 12,
+        color: colors.secundary,
+        textAlign: "center",
     },
 
-    // Tarjetas de clima
-    cardsContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20,
-    },
-    card: {
-        flex: 1,
-        backgroundColor: "rgb(253, 253, 253)",
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.4)",
-        marginHorizontal: 5,
-        padding: 12,
-        borderRadius: 16,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    cardTitle: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        marginTop: 6,
-    },
-    cardValue: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: colors.text, // gris oscuro
-        marginTop: 4,
-    },
-
-    // Sección de huertos
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: colors.primary,
-        marginBottom: 10,
-    },
     placeholder: {
-        color: colors.textSecondary,
+        fontSize: 16,
+        color: "#7f8c8d",
         textAlign: "center",
         marginTop: 20,
     },
-    gardenCard: {
-        backgroundColor: colors.cardBackground,
+
+    // Widget de clima
+    weatherWidget: {
+        marginTop: 20,
+        alignSelf: "center",
+        width: "90%",
         borderRadius: 16,
-        padding: 20,
-        marginBottom: 16,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 4,
-    },
-    gardenTitle: {
-        fontSize: 18,
-        fontWeight: "700",
-        marginBottom: 8,
-        color: colors.primary,
-    },
-    gardenNote: {
-        fontSize: 14,
-        color: colors.accent,
-        marginBottom: 12,
-    },
-    button: {
-        backgroundColor: colors.primary,
-        borderRadius: 8,
-        paddingVertical: 10,
-        alignItems: "center",
-    },
-    buttonText: {
-        color: "#fff",
-        fontWeight: "600",
+        overflow: "hidden",
+        marginBottom: 20,
     },
 
-    // Boton flotante
+    weatherImage: {
+        width: "100%",
+        height: 180,
+        justifyContent: "center",
+    },
+
+    weatherOverlay: {
+        padding: 16,
+        borderRadius: 16,
+    },
+
+    weatherTemp: {
+        fontSize: 32,
+        color: "#fff",
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+
+    weatherDesc: {
+        fontSize: 18,
+        color: "#fff",
+        marginTop: 6,
+        textAlign: "center",
+    },
+
+    weatherHumidity: {
+        fontSize: 14,
+        color: "#fff",
+        marginTop: 4,
+        textAlign: "center",
+    },
+
+
+    // Botón flotante
     fab: {
         position: "absolute",
         bottom: 20,
         right: 20,
-        backgroundColor: colors.accent,
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        alignItems: "center",
+        backgroundColor: "#27ae60",
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         justifyContent: "center",
+        alignItems: "center",
         elevation: 5,
+    },
+    weatherContent: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 16,
+    },
+
+    weatherLeft: {
+        flexDirection: "column",
+        alignItems: "flex-start",
+    },
+
+    weatherRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 8,
+    },
+
+    weatherIcon: {
+        marginRight: 8,
+    },
+
+
+    weatherRight: {
+        alignItems: "flex-end",
+    },
+
+    weatherTime: {
+        fontSize: 20,
+        fontWeight: "600",
+        color: "#fff",
+    },
+
+    weatherDate: {
+        fontSize: 14,
+        color: "#fff",
+        marginTop: 4,
     },
     footerImage: {
         width: width,
-        height: 120,
+        height: 170,
         position: "absolute",
-        bottom: 0,
-    },
-    headerImage: {
-        width: "100%",
-        height: 220,
-        marginTop: 0,
-        marginBottom: -20,
-        zIndex: 10,
+        top: 600,
     },
 });
+
+export default homeStyle;
