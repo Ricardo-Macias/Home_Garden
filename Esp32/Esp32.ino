@@ -3,6 +3,8 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 #include <WiFi.h>
+#include <WiFiUdp.h>
+#include <NTPClient.h>
 #include <DHT.h>
 #include <HTTPClient.h>
 #include <Wire.h>
@@ -27,12 +29,18 @@ String receivedSSID;
 String receivedPassword;
 const char* serverUrl = API;
 
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", -21600, 60000);
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long lastTime = 0;
 const unsigned long interval = 300000; // 5 Minutos (300000)
 unsigned long lastReadingTime = 0;
 const unsigned long readingInterval = 2000;
+unsigned long irrigationStart = 0;
+unsigned long wateringTime = 0;
+int lastHour = -1;
+bool watered = false;
 
 /*
   Struct
@@ -201,20 +209,20 @@ float trapezoidal(float x, float a, float b, float c, float d){
   return (d - x) / (d - c);
 }
 
-float sugeno(float hum, float temp, float luz){
+float sugeno(float hum, float temp, float lux, float humAmb){
   
-  float seco = trapezoidal(humedad, 0, 0, 30, 37);
-  float optimo = triangular(humedad, 40, 42, 47);
-  float saturado = trapezoidal(humedad, 47, 55, 100, 100);
+  float seco = trapezoidal(hum, 0, 0, 30, 37);
+  float optimo = triangular(hum, 40, 42, 47);
+  float saturado = trapezoidal(hum, 47, 55, 100, 100);
 
   float tempBaja = trapezoidal(temp, 0, 0, 10, 15);
   float tempAlta = trapezoidal(temp, 20, 26, 40, 40);
 
-  float luzBaja = trapezoidal(luz, 0, 0, 500, 2500);
-  float luzAlta = trapezoidal(luz, 1500, 5000, 65535, 65535);
+  float luzBaja = trapezoidal(lux, 0, 0, 500, 2500);
+  float luzAlta = trapezoidal(lux, 1500, 5000, 65535, 65535);
 
-  float humedadAmbienteBaja = trapezoidal(humedadAmbiente, 0, 0, 20, 30);
-  float humedadAmbienteAlta = trapezoidal(humedadAmbiente, 58, 60, 100, 100);
+  float humedadAmbienteBaja = trapezoidal(humAmb, 0, 0, 20, 30);
+  float humedadAmbienteAlta = trapezoidal(humAmb, 58, 60, 100, 100);
   
   //Reglas (peso = min)
 
@@ -308,11 +316,17 @@ void setup() {
 
   Wire.begin(21, 22);
   lightMeter.begin();
+  timeClient.begin();
 } 
 
 void loop() {
-  
+
   if(millis() - lastReadingTime >= readingInterval){
+    Sensors value = readSensors();
+
+    timeClient.update();
+    int hour = timeClient.getHours();
+    int minutes = timeClient.getMinutes();
 
     bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
     bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
@@ -329,6 +343,20 @@ void loop() {
       lastValueLux = value.lux;
       lastValueSoilMoisture = value.soilMoisture;
     }
+
+    if ((hour == 0 || hour == 6 || hour== 12 || hour == 18) && minutes == 0 && hour != lastHour && !watered){
+      wateringTime = sugeno(lastValueHumidity, lastValueTemperature, lastValueLux, lastValueSoilMoisture);
+      lastHour = hour;
+      watered = true;
+      irrigationStart = millis()
+      // Aqui se activara la bomba
+    }
+
+    if (watered && millis - irrigationStart => wateringTime){
+      watered = false;
+      // Aqui desactivar la bomba
+    }
+
     lastReadingTime = millis();
   }
 }
