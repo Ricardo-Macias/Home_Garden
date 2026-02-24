@@ -13,14 +13,14 @@ export default function TabsLayout() {
                     headerShown: false,
 
                     tabBarActiveTintColor: "#228B22",
-                    tabBarInactiveTintColor: "#ffffff",
+                    tabBarInactiveTintColor: "#7FC563",
 
                     tabBarStyle: {
                         position: "absolute",
                         marginHorizontal: 20,
                         bottom: insets.bottom > 0 ? insets.bottom : 10,
-                        backgroundColor: "transparent",
-                        borderRadius: 40,
+                        backgroundColor: "#fff",
+                        borderRadius: 35,
                         height: 70,
                         shadowColor: "#000",
                         shadowOpacity: 0.1,
