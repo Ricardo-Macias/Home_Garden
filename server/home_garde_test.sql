@@ -18,7 +18,15 @@ CREATE TABLE IF NOT EXISTS cultivo (
     dificultad CHAR(10) NOT NULL,
     duracion INT NOT NULL,
     descripcion VARCHAR(280) NOT NULL,
-    consejos VARCHAR(280) NOT NULL
+    consejos VARCHAR(280) NOT NULL,
+    humedadAmbiente_min FLOAT NOT NULL,
+    humedadAmbiente_max FLOAT NOT NULL,
+    humedadSuelo_min FLOAT NOT NULL,
+    humedadSuelo_max FLOAT NOT NULL,
+    temperatura_min FLOAT NOT NULL,
+    temperatura_max FLOAT NOT NULL,
+    luz_min FLOAT NOT NULL,
+    luz_max FLOAT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sensor(
@@ -29,18 +37,26 @@ CREATE TABLE IF NOT EXISTS sensor(
 );
 
 CREATE TABLE IF NOT EXISTS huerto (
-	idHuerto INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idHuerto INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idSensor INT NOT NULL,
     idCultivo INT NOT NULL,
     nombre VARCHAR(80),
     estado BOOLEAN,
-    imagen VARCHAR(180),
     fechaInicio DATE NOT NULL,
     fechaEstimada DATE,
     fechaFin DATE,
     FOREIGN KEY(idSensor) REFERENCES sensor(idSensor),
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
 );
+
+CREATE TABLE IF NOT EXISTS huerto_imagen (
+    idImagen INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idHuerto INT NOT NULL,
+    rutaImagen VARCHAR(180) NOT NULL,
+    fechaCaptura DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(idHuerto) REFERENCES huerto(idHuerto)
+);
+
 
 CREATE TABLE IF NOT EXISTS sensor_data(
     idSensorData INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
