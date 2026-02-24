@@ -37,6 +37,9 @@ import {
     getSensorData
 } from "./controllers/sensorController.js"
 
+import { checkSensorRanges } from "./controllers/cultivoController.js";
+
+
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
     methods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
@@ -88,6 +91,7 @@ app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 /**
  * CULTIVO
 */
+app.post("/checkSensorRanges", checkSensorRanges);
 
 app.get("/searchIdCrop/:nombre", searchIdCrop);
 app.get("/durationCrop/:nombre", durationCrop);
