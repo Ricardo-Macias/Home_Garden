@@ -59,7 +59,6 @@ export default function HomeGardenGrid({ huertos }: Props) {
                     },
                 ]}
             >
-                {/* Layout en fila: imagen izquierda, info derecha */}
                 <View style={gardenCardStyle.row}>
                     <Image
                         source={{ uri: imageUrl }}
