@@ -29,7 +29,7 @@ export async function insertUser(name, lastName, email, pass) {
 }
 
 // LOGIN
-export async function findUserForLogin(email, pass) { 
+export async function findUserForLogin(email, pass) {
     const [rows] = await pool.query(
         `SELECT * FROM usuario WHERE correo = ?`,
         [email]
@@ -75,7 +75,7 @@ export async function deleteUser(id) {
  * Consultas de perfil
 */
 
- // PERFIL: obtener datos del usuario + historial de huertos
+// PERFIL: obtener datos del usuario + historial de huertos
 export async function getUserProfile(idUsuario) {
     // Datos básicos del usuario
     const [userRows] = await pool.query(
@@ -137,16 +137,16 @@ export async function insertSensor(idUsuario, name) {
  *  Consultas en la tabla de sensor_data 
  */
 
-export async function insertSensorData(idSensor, temperature, humedity, soilMoisture, light){
+export async function insertSensorData(idSensor, temperature, humedity, soilMoisture, light) {
     const [result] = await pool.query(
         `INSERT INTO sensor_data (idSensor, temperatura, humedadAmbiente, humedadSuelo, luz) VALUES (?, ?, ?, ?, ?)`,
         [idSensor, temperature, humedity, soilMoisture, light]
     );
-    
+
     return result;
 }
 
-export async function lastValueRecordedSensorData(idSensor){
+export async function lastValueRecordedSensorData(idSensor) {
     const [result] = await pool.query(
         `SELECT * FROM sensor_data WHERE idSensor = ? ORDER BY idSensorData DESC LIMIT 1`,
         [idSensor]
@@ -174,7 +174,7 @@ export async function updateSensor(id, name) {
 /*
  *  Consultas en la tabla huerto
 */
-export async function getAllGarden(idUsuario){
+export async function getAllGarden(idUsuario) {
     const [row] = await pool.query(
         `SELECT * FROM vw_home WHERE usuario = ?`,
         [idUsuario]
@@ -220,7 +220,7 @@ export async function updateGarden(id, idCrop) {
  *  Consultas en la tabla cultivo
 */
 
-export async function getIdCrop(name){
+export async function getIdCrop(name) {
     const [row] = await pool.query(
         `SELECT * FROM cultivo WHERE nombre = ?`,
         [name]
@@ -229,7 +229,7 @@ export async function getIdCrop(name){
     return cropId;
 }
 
-export async function getDurationCrop(name){
+export async function getDurationCrop(name) {
     const [row] = await pool.query(
         `SELECT * FROM cultivo WHERE nombre = ?`,
         [name]
@@ -248,19 +248,68 @@ export async function getAllCrop() {
 
 export async function insertCrop(name, kind, difficult, description, tips) {
     const [result] = await pool.query(
-        `INSERT INTO huerto (nombre, tipo, dificultad, descripcion, consejos)
-        VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO cultivo (nombre, tipo, dificultad, descripcion, consejos)
+     VALUES (?, ?, ?, ?, ?)`,
         [name, kind, difficult, description, tips]
     );
-
     return result;
 }
 
 export async function searchCrop(name) {
-    conts[result] = await pool.query(
+    const [rows] = await pool.query(
         `SELECT * FROM cultivo WHERE nombre = ?`,
         [name]
     );
+    return rows;
+}
+// Consultar rangos de un cultivo por nombre
+export async function getCropRanges(name) {
+    const [rows] = await pool.query(
+        `SELECT 
+        humedadAmbiental_min, humedadAmbiental_max,
+        humedadSuelo_min, humedadSuelo_max,
+        temperatura_min, temperatura_max,
+        luz_min, luz_max
+     FROM cultivo
+     WHERE nombre = ?`,
+        [name]
+    );
+    return rows[0];
+}
 
-    return result;
+// Obtener cultivo por ID
+export async function getCropById(id) {
+    const [rows] = await pool.query(`SELECT * FROM cultivo WHERE id = ?`, [id]);
+    return rows[0];
+}
+
+// Obtener cultivo por nombre
+export async function getCropByName(name) {
+    const [rows] = await pool.query(`SELECT * FROM cultivo WHERE nombre = ?`, [nombre]);
+    return rows[0];
+}
+
+// Filtrar cultivos por tipo, dificultad y duración
+export async function filterCrops({ tipo, dificultad, duracionMin, duracionMax }) {
+    let query = "SELECT * FROM cultivo WHERE 1=1";
+    const params = [];
+
+    if (tipo) {
+        query += " AND tipo = ?";
+        params.push(tipo);
+    }
+    if (dificultad) {
+        query += " AND dificultad = ?";
+        params.push(dificultad);
+    }
+    if (duracionMin) {
+        query += " AND duracion >= ?";
+        params.push(duracionMin);
+    }
+    if (duracionMax) {
+        query += " AND duracion <= ?";
+        params.push(duracionMax);
+    }
+    const [rows] = await pool.query(query, params);
+    return rows;
 }

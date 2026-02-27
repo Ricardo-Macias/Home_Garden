@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, TouchableOpacity, Image } from "react-native";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "expo-router";
 import ModalSensor from "@/components/Sensor/ModalSensor";
@@ -7,12 +7,19 @@ import Constants from "expo-constants";
 import { MaterialIcons } from "@expo/vector-icons";
 import BluetoothLeManager from "@/components/Bluetooth/BluetoothLeManager";
 import * as SecureStore from "expo-secure-store";
-
 import HomeGardenGrid from "@/components/Home/HomeGardenGrid";
+import homeStyle from "../../styles/homeStyles";
+import { useAppSelector } from "../../Redux/store";
+import { ImageBackground } from "expo-image";
+import homeStyles from "../../styles/homeStyles";
+import { getWeatherCategory, getRandomWeatherImage } from "../../components/utils/weatherImages";
+import { getWeatherIcon } from "../../components/utils/weatherIcons";
 
 interface AppConfig {
     API_URL: string;
+    WEATHER_API_KEY: string;
 }
+
 const config = Constants.expoConfig?.extra as AppConfig;
 
 export default function Home() {
@@ -20,19 +27,62 @@ export default function Home() {
 
     const [modalBluetoothVisible, setModalBluetoothVisible] = useState(false);
     const [modalWifiVisible, setModalWifiVisible] = useState(false);
-
     const [deviceName, setDeviceName] = useState<string | null>("");
     const [ssid, setSsid] = useState("");
     const [password, setPassword] = useState<string>("");
-
     const [huertos, setHuertos] = useState<any[]>([]);
     const [userId, setUserId] = useState<number | null>(null);
+
+    // Fecha y hora 
+    const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
+    useEffect(() => {
+        const fetchTime = async () => {
+            try {
+                const response = await fetch("https://timeapi.io/api/Time/current/zone?timeZone=America/Mexico_City");
+                const data = await response.json();
+                const serverTime = new Date(data.dateTime);
+                setCurrentTime(serverTime);
+            } catch (error) {
+                console.error("Error al cargar hora:", error);
+            }
+        };
+
+        fetchTime();
+
+        const interval = setInterval(() => {
+            setCurrentTime(prev => prev ? new Date(prev.getTime() + 1000) : null);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const mesesAbrev = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+    const dia = currentTime ? currentTime.getDate() : "";
+    const mes = currentTime ? mesesAbrev[currentTime.getMonth()] : "";
+    const año = currentTime ? currentTime.getFullYear() : "";
+
+    const shortDate = currentTime ? `${dia} ${mes} ${año}` : "";
+    const shortTime = currentTime
+        ? currentTime.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
+        : "";
+
+    // Clima
+    const [humidity, setHumidity] = useState<number | null>(null);
+    const [temperature, setTemperature] = useState<number | null>(null);
+    const [weather, setWeather] = useState<string>("");
+
+    const category = getWeatherCategory(weather);
+    const weatherImage = getRandomWeatherImage(category);
+    const weatherIconName = getWeatherIcon(weather);
+
+    const user = useAppSelector((state) => state.auth.user);
 
     const {
         requestPermissions,
         scanForPeripherals,
         connectToDevice,
-        connectedDevice,
         allDevices,
         sendCredentials,
     } = BluetoothLeManager();
@@ -43,7 +93,16 @@ export default function Home() {
         sendCredentialsRef.current = sendCredentials;
     }, [sendCredentials]);
 
-    // usuario
+    // Imagen del clima
+    const [weatherImageFixed, setWeatherImageFixed] = useState(getRandomWeatherImage(weather));
+
+    useEffect(() => {
+        if (weather) {
+            setWeatherImageFixed(getRandomWeatherImage(weather));
+        }
+    }, [weather]);
+
+    // Cargar usuario
     useEffect(() => {
         const loadUser = async () => {
             const userStr = await SecureStore.getItemAsync("user");
@@ -55,6 +114,7 @@ export default function Home() {
         loadUser();
     }, []);
 
+    // Cargar huertos
     useEffect(() => {
         if (!userId) return;
 
@@ -73,6 +133,27 @@ export default function Home() {
 
         fetchData();
     }, [userId]);
+
+    // Clima
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=20.7167&lon=-103.4&units=metric&appid=${config.WEATHER_API_KEY}&lang=es`
+                );
+
+                const data = await response.json();
+
+                setTemperature(data.main?.temp ?? null);
+                setHumidity(data.main?.humidity ?? null);
+                setWeather(data.weather?.[0]?.description ?? "");
+            } catch (error) {
+                console.error("Error al cargar clima:", error);
+            }
+        };
+
+        fetchWeather();
+    }, []);
 
     const scanForDevices = async () => {
         const isPermissionsEnable = await requestPermissions();
@@ -125,71 +206,94 @@ export default function Home() {
         }
     }, [modalWifiVisible, password, ssid, userId]);
 
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Bienvenido</Text>
+        <View style={{ flex: 1 }}>
+            {/* Widget de clima */}
+            <View style={homeStyle.weatherWidget}>
+                <ImageBackground
+                    source={weatherImageFixed}
+                    style={homeStyle.weatherImage}
+                    imageStyle={{ borderRadius: 16 }}
+                >
+                    <View style={homeStyle.weatherContent}>
+                        {/* Parte izquierda */}
+                        <View style={homeStyle.weatherLeft}>
+                            <View style={homeStyle.weatherRow}>
+                                <MaterialIcons
+                                    name={weatherIconName}
+                                    size={28}
+                                    color="#fff"
+                                    style={homeStyle.weatherIcon}
+                                />
+                                <Text style={homeStyle.weatherDesc}>{weather || "Clima desconocido"}</Text>
+                            </View>
 
-            {huertos.length === 0 ? (
-                <Text style={styles.empty}>
-                    No tienes huertos registrados 
-                </Text>
-            ) : (
-                <HomeGardenGrid huertos={huertos} />
-            )}
+                            <Text style={homeStyle.weatherTemp}>
+                                {temperature !== null ? `${temperature}°C` : "--"}
+                            </Text>
+                            <Text style={homeStyle.weatherHumidity}>
+                                Humedad: {humidity !== null ? `${humidity}%` : "--"}
+                            </Text>
+                        </View>
 
-            <View style={styles.buttonAdd}>
-                <TouchableOpacity onPress={onModalOpen}>
-                    <MaterialIcons name="add" size={28} color="#f9f9f9" />
-                </TouchableOpacity>
-                { modalBluetoothVisible && (<ModalSensor
+                        {/* Parte derecha */}
+                        <View style={homeStyle.weatherRight}>
+                            <Text style={homeStyle.weatherTime}>{shortTime}</Text>
+                            <Text style={homeStyle.weatherDate}>{shortDate}</Text>
+                        </View>
+
+                    </View>
+                </ImageBackground>
+            </View>
+
+            {/* huertos */}
+            <View style={homeStyle.container}>
+                <Text style={homeStyle.subtitle}>Mis huertos</Text>
+                {huertos.length === 0 ? (
+                    <Text style={homeStyle.placeholder}>No tienes huertos registrados</Text>
+                ) : (
+                    <HomeGardenGrid huertos={huertos} />
+                )}
+            </View>
+
+            {/* Modales */}
+            {modalBluetoothVisible && (
+                <ModalSensor
                     setDeviceName={setDeviceName}
                     items={allDevices}
                     isVisible={modalBluetoothVisible}
                     connectedToPeripheral={connectToDevice}
                     goToConnectedWifi={goToConnectedWifi}
-                    onClose={onModalClose}>
+                    onClose={onModalClose}
+                >
                     <></>
-                </ModalSensor>)}
+                </ModalSensor>
+            )}
 
-                { modalWifiVisible && (<ModalConnectWifi
+            {modalWifiVisible && (
+                <ModalConnectWifi
                     ssid={ssid}
                     setSsid={setSsid}
                     password={password}
                     setPassword={setPassword}
                     isVisible={modalWifiVisible}
-                    onClose={onModalWifiClose}>
+                    onClose={onModalWifiClose}
+                >
                     <></>
-                </ModalConnectWifi> )}
-            </View>
+                </ModalConnectWifi>
+            )}
+
+            {/* Boton flotante */}
+            <TouchableOpacity style={homeStyle.fab} onPress={onModalOpen}>
+                <MaterialIcons name="add" size={28} color="#fff" />
+            </TouchableOpacity>
+
+            <Image
+                source={require("../../assets/images/garden_footer.png")}
+                style={homeStyles.footerImage}
+                resizeMode="cover"
+            />
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 12,
-        position: "relative",
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    empty: {
-        textAlign: "center",
-        marginTop: 40,
-        color: "#666",
-    },
-    buttonAdd: {
-        backgroundColor: "#6A1B9A",
-        position: "absolute",
-        bottom: 5,
-        right: 15,
-        borderRadius: 10,
-        width: 60,
-        height: 60,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});
