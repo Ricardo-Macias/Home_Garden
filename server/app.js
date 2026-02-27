@@ -37,7 +37,7 @@ import {
     getSensorData
 } from "./controllers/sensorController.js"
 
-import { checkSensorRanges } from "./controllers/cultivoController.js";
+import cultivoRoutes from "./routes/cultivo.js";
 
 
 const corsOptions = {
@@ -91,14 +91,7 @@ app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 /**
  * CULTIVO
 */
-app.post("/checkSensorRanges", checkSensorRanges);
-
-app.get("/searchIdCrop/:nombre", searchIdCrop);
-app.get("/durationCrop/:nombre", durationCrop);
-app.get("/crop", async (req, res) => {
-    const crop = await getAllCrop();
-    res.status(200).send(crop);
-});
+app.use(cultivoRoutes);
 
 /*
     Subir Imagen

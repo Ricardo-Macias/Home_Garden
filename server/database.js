@@ -276,3 +276,40 @@ export async function getCropRanges(name) {
     );
     return rows[0];
 }
+
+// Obtener cultivo por ID
+export async function getCropById(id) {
+    const [rows] = await pool.query(`SELECT * FROM cultivo WHERE id = ?`, [id]);
+    return rows[0];
+}
+
+// Obtener cultivo por nombre
+export async function getCropByName(name) {
+    const [rows] = await pool.query(`SELECT * FROM cultivo WHERE nombre = ?`, [nombre]);
+    return rows[0];
+}
+
+// Filtrar cultivos por tipo, dificultad y duración
+export async function filterCrops({ tipo, dificultad, duracionMin, duracionMax }) {
+    let query = "SELECT * FROM cultivo WHERE 1=1";
+    const params = [];
+
+    if (tipo) {
+        query += " AND tipo = ?";
+        params.push(tipo);
+    }
+    if (dificultad) {
+        query += " AND dificultad = ?";
+        params.push(dificultad);
+    }
+    if (duracionMin) {
+        query += " AND duracion >= ?";
+        params.push(duracionMin);
+    }
+    if (duracionMax) {
+        query += " AND duracion <= ?";
+        params.push(duracionMax);
+    }
+    const [rows] = await pool.query(query, params);
+    return rows;
+}
