@@ -54,3 +54,6 @@ app-example
 
 #esp32
 api.h
+
+#Control Difuso
+venv
