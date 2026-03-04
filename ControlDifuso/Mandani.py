@@ -3,13 +3,13 @@ import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import matplotlib.pyplot as plt
 
-def mandani():
+def mandani(valueSoilMoisture, valueTemperature, valueLight, valueHumidity):
     soilMoisture = ctrl.Antecedent(np.arange(0, 101, 1), 'humedad_suelo')
     temperature = ctrl.Antecedent(np.arange(0, 41, 1), 'temperatura')
     light = ctrl.Antecedent(np.arange(0, 65001, 1), 'luz')
     humidity = ctrl.Antecedent(np.arange(0, 101, 1), 'humedad_ambiente')
 
-    irrigation = ctrl.Consequent(np.arange(0,61, 1), 'riego')
+    irrigation = ctrl.Consequent(np.arange(0,121, 1), 'riego')
 
     soilMoisture['baja'] = fuzz.trapmf(soilMoisture.universe, [0, 0, 30, 40])
     soilMoisture['optimo'] = fuzz.trimf(soilMoisture.universe, [30, 50, 70]) 
@@ -27,9 +27,9 @@ def mandani():
     humidity['optimo'] = fuzz.trimf(humidity.universe, [45, 65, 85])
     humidity['alta'] = fuzz.trapmf(humidity.universe, [70, 80, 100, 100])
 
-    irrigation['bajo'] = fuzz.trapmf(irrigation.universe, [0, 0, 10, 20])
-    irrigation['medio'] = fuzz.trimf(irrigation.universe, [15, 30, 45])
-    irrigation['alto'] = fuzz.trapmf(irrigation.universe, [40, 50, 60, 60])
+    irrigation['bajo'] = fuzz.trapmf(irrigation.universe, [0, 0, 15, 30])
+    irrigation['medio'] = fuzz.trimf(irrigation.universe, [20, 40, 60])
+    irrigation['alto'] = fuzz.trapmf(irrigation.universe, [50, 85, 120, 120])
 
     rule1 = ctrl.Rule(soilMoisture['baja'] & temperature['alta'] & light['alta'] & humidity['baja'], irrigation['alto'])
     rule2 = ctrl.Rule(soilMoisture['baja'] & temperature['optimo'] & light['optimo'], irrigation['medio'])
@@ -46,15 +46,11 @@ def mandani():
     simulacion = ctrl.ControlSystemSimulation(sistema_ctrl)
 
 
-    simulacion.input['humedad_suelo'] = 25
-    simulacion.input['temperatura'] = 32
-    simulacion.input['luz'] = 850
-    simulacion.input['humedad_ambiente'] = 30
+    simulacion.input['humedad_suelo'] = valueSoilMoisture
+    simulacion.input['temperatura'] = valueTemperature
+    simulacion.input['luz'] = valueLight
+    simulacion.input['humedad_ambiente'] = valueHumidity
 
     simulacion.compute()
 
     return simulacion.output['riego']
-
-
-print("Nivel de riego: ", mandani())
-
