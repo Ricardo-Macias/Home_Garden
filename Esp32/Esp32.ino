@@ -9,6 +9,7 @@
 #include <HTTPClient.h>
 #include <Wire.h>
 #include <BH1750.h>
+#include <ArduinoJson.h>
 #include "api.h"
 
 Preferences prefs;
@@ -28,6 +29,7 @@ String deviceName;
 String receivedSSID;
 String receivedPassword;
 const char* serverUrl = API;
+const char* FreshApiUrl = FreshAPI;
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", -21600, 60000);
@@ -110,7 +112,6 @@ void saveConfig(){
   Conectar WiFI
 */
 void connectToWiFi() {
-  //Serial.println("\n Intentando conectar a WiFI...");
   WiFi.begin(receivedSSID.c_str(), receivedPassword.c_str());
 
   int timeout = 0;
@@ -192,68 +193,39 @@ void setupBluetooth() {
 }
 
 /*
-  Control difuso - Sugeno
+  Control difuso
 */
 
-float triangular(float x, float a, float b, float c) {
-  if (x <= a || x >= c) return 0;
-  if (x == b) return 1;
-  if (x < b) return (x - a) / (b - a);
-  return (c - x) / (c - b); 
-}
+float fuzzy(int hum, float temp, float lux, float humAmb){
+  if(WiFi.status() == WL_CONNECTED){
+    float seconds = 0;
 
-float trapezoidal(float x, float a, float b, float c, float d){
-  if (x <= a || x >= d) return 0;
-  if (x >= b && x <= c) return 1;
-  if (x < b) return (x - a) / (b - a);
-  return (d - x) / (d - c);
-}
+    HTTPClient http;
+    http.begin(FreshApiUrl);
+    http.addHeader("Content-Type", "application/json");
 
-float sugeno(float hum, float temp, float lux, float humAmb){
-  
-  float seco = trapezoidal(hum, 0, 0, 30, 37);
-  float optimo = triangular(hum, 40, 42, 47);
-  float saturado = trapezoidal(hum, 47, 55, 100, 100);
+    String json = "{\"soilMoisture\":" + String(hum) + ","
+              "\"temperature\":" + String(temp) + ","
+              "\"humidity\":" + String(humAmb) + ","
+              "\"light\":" + String(lux) + "}";
 
-  float tempBaja = trapezoidal(temp, 0, 0, 10, 15);
-  float tempAlta = trapezoidal(temp, 20, 26, 40, 40);
+    int httpResponseCode = http.POST(json);
+    
+    if (httpResponseCode > 0){
+      String response = http.getString();
 
-  float luzBaja = trapezoidal(lux, 0, 0, 500, 2500);
-  float luzAlta = trapezoidal(lux, 1500, 5000, 65535, 65535);
+      StaticJsonDocument<128> doc;
+      DeserializationError error = deserializeJson(doc, response);
 
-  float humedadAmbienteBaja = trapezoidal(humAmb, 0, 0, 20, 30);
-  float humedadAmbienteAlta = trapezoidal(humAmb, 58, 60, 100, 100);
-  
-  //Reglas (peso = min)
-
-  float w1 = min(seco, min(tempAlta, min(luzAlta, humedadAmbienteBaja)));
-  float w2 = min(seco, min(tempAlta, min(luzAlta, humedadAmbienteAlta)));
-  float w3 = min(seco, min(tempBaja, min(humedadAmbienteBaja, luzAlta)));
-  float w4 = min(seco, min(tempBaja, humedadAmbienteAlta));
-  float w5 = min(optimo, luzAlta);
-  float w6 = min(optimo, tempAlta);
-  float w7 = min(optimo, tempBaja);
-  float w8 = saturado;
-
-  // Salidas constantes
-
-  float z1 = 140;
-  float z2 = 120;
-  float z3 = 100;
-  float z4 = 90;
-  float z5 = 50;
-  float z6 = 10;
-  float z7 = 0;
-  float z8 = 0;
-
-  // Promedio ponderado
-
-  float numerador = (w1 * z1) + (w2 * z2) + (w3 * z3) + (w4 * z4) + (w5 * z5) + (w6 * z6) + (w7 * z7 ) + (w8 * z8);
-
-  float denominador = w1 + w2 + w3 + w4 + w5 + w6 + w7 + w8;
-  if (denominador == 0) return 0;
-
-  return numerador / denominador; 
+      if(!error){
+        watered = doc["irrigation"];
+        seconds = doc["seconds"];
+      }
+    } 
+    
+    http.end();
+    return seconds;
+  }
 
 }
 
@@ -309,17 +281,19 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   saveConfig();
-
+  
   pinMode(soil_moisture_pin, INPUT);
   pinMode(SLAVE,OUTPUT);
+  digitalWrite(SLAVE, LOW);
   dht.begin();
 
   Wire.begin(21, 22);
   lightMeter.begin();
   timeClient.begin();
+  
 } 
 
-void loop() {
+void loop() { 
 
   if(millis() - lastReadingTime >= readingInterval){
     Sensors value = readSensors();
@@ -327,7 +301,7 @@ void loop() {
     timeClient.update();
     int hour = timeClient.getHours();
     int minutes = timeClient.getMinutes();
-
+    
     bool changeHumidity = abs(value.humidity - lastValueHumidity) >= umbralHumidity;
     bool changeTemperature = abs(value.temperature - lastValueTemperature) >= umbralTemperature;
     bool changeLux = abs(value.lux - lastValueLux) >= umbralLight;
@@ -336,27 +310,50 @@ void loop() {
     if(millis() - lastTime >= interval || changeSoilMoisture || changeTemperature || changeHumidity || changeLux){
       
       saveData(value.temperature, value.humidity, value.soilMoisture, value.lux);
+      
+      Serial.print("Humedad del suelo: ");
+      Serial.print(value.soilMoisture);
+      Serial.println("%");
+      
+      Serial.print("Temperatura: ");
+      Serial.print(value.temperature);
+      Serial.println("°C");
+
+      Serial.print("Humedad del Ambiente: ");
+      Serial.print(value.humidity);
+      Serial.println("%");
+
+      Serial.print("Luz: ");
+      Serial.print(value.lux);
+      Serial.println(" Lux");
 
       lastTime = millis();
       lastValueHumidity = value.humidity;
       lastValueTemperature = value.temperature;
       lastValueLux = value.lux;
       lastValueSoilMoisture = value.soilMoisture;
+      
     }
 
-    if ((hour == 0 || hour == 6 || hour== 12 || hour == 18) && minutes == 0 && hour != lastHour && !watered){
-      wateringTime = sugeno(lastValueHumidity, lastValueTemperature, lastValueLux, lastValueSoilMoisture);
+    
+    if ((hour == 0 || hour == 6 || hour == 12 || hour == 18) && minutes == 0 && hour != lastHour && !watered){ 
+      wateringTime = fuzzy(value.soilMoisture, value.temperature, value.lux, value.humidity);
       lastHour = hour;
-      watered = true;
-      irrigationStart = millis()
-      // Aqui se activara la bomba
+      irrigationStart = millis();
+      if (wateringTime != 0){
+        digitalWrite(SLAVE, HIGH);
+      }
+      Serial.print("-------------> Se prendio la Bomba ");
+      Serial.println(wateringTime);
     }
 
-    if (watered && millis - irrigationStart => wateringTime){
+    if (watered && (millis() - irrigationStart) >= (wateringTime * 1000)){
       watered = false;
-      // Aqui desactivar la bomba
+      Serial.println("-------------> Se Apago la Bomba");
+      digitalWrite(SLAVE, LOW);
     }
 
     lastReadingTime = millis();
   }
+  
 }
