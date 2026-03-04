@@ -1,8 +1,6 @@
 const weatherImages: Record<string, any[]> = {
     soleado: [
-        require("../../assets/images/weather/sunny1.png"),
-        require("../../assets/images/weather/sunny2.png"),
-        require("../../assets/images/weather/sunny3.png"),
+        require("../../assets/images/weather/cielo_claro.png"),
     ],
     soleado_noche: [
         require("../../assets/images/weather/sunny_noche.png"),
