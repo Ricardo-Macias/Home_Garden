@@ -1,4 +1,13 @@
-import { getCropRanges } from "../database.js";
+import {
+    getAllCrop,
+    getCropById,
+    getCropByName,
+    getIdCrop,
+    getDurationCrop,
+    filterCrops,
+    getCropRanges
+} from "../database.js";
+
 
 /**
  * Obtener todos los cultivos
