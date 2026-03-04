@@ -289,11 +289,12 @@ export default function Home() {
                 <MaterialIcons name="add" size={28} color="#fff" />
             </TouchableOpacity>
 
-            <Image
+            {/* pie de pagina */}
+            {/*<Image
                 source={require("../../assets/images/garden_footer.png")}
                 style={homeStyles.footerImage}
                 resizeMode="cover"
-            />
+            /> */}
         </View>
     );
 }
