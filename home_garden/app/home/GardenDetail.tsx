@@ -204,13 +204,8 @@ export default function GardenDetail() {
                         </View>
                     )}
 
-                    {/* Imagen dinámica humedad suelo */}
-                    {sensorData?.humedadSuelo && (
-                        <Image
-                            source={getStatusImage(sensorData.humedadSuelo)}
-                            style={GardenDetailStyle.statusImage}
-                        />
-                    )}
+                    {/* Imagen dinamica humedad suelo */}
+                    
                 </ScrollView>
             </SafeAreaView>
         </>

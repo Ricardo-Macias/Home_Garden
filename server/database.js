@@ -279,13 +279,19 @@ export async function getCropRanges(name) {
 
 // Obtener cultivo por ID
 export async function getCropById(id) {
-    const [rows] = await pool.query(`SELECT * FROM cultivo WHERE id = ?`, [id]);
+    const [rows] = await pool.query(
+        `SELECT * FROM cultivo WHERE id = ?`,
+        [id]
+    );
     return rows[0];
 }
 
 // Obtener cultivo por nombre
 export async function getCropByName(name) {
-    const [rows] = await pool.query(`SELECT * FROM cultivo WHERE nombre = ?`, [nombre]);
+    const [rows] = await pool.query(
+        `SELECT * FROM cultivo WHERE nombre = ?`,
+        [name]
+    );
     return rows[0];
 }
 
@@ -312,4 +318,47 @@ export async function filterCrops({ tipo, dificultad, duracionMin, duracionMax }
     }
     const [rows] = await pool.query(query, params);
     return rows;
+}
+
+/*
+ *  Consultas en la tabla favoritos
+*/
+
+// Agregar un cultivo a favoritos de un usuario
+export async function addFavorite(usuarioId, cultivoId) {
+    const [result] = await pool.query(
+        `INSERT INTO favoritos (usuario_id, cultivo_id) VALUES (?, ?)`,
+        [usuarioId, cultivoId]
+    );
+    return result;
+}
+
+// Eliminar un cultivo de favoritos de un usuario
+export async function removeFavorite(usuarioId, cultivoId) {
+    const [result] = await pool.query(
+        `DELETE FROM favoritos WHERE usuario_id = ? AND cultivo_id = ?`,
+        [usuarioId, cultivoId]
+    );
+    return result;
+}
+
+// Obtener todos los favoritos de un usuario 
+export async function getFavoritesByUser(usuarioId) {
+    const [rows] = await pool.query(
+        `SELECT c.* 
+         FROM cultivo c
+         INNER JOIN favoritos f ON c.id = f.cultivo_id
+         WHERE f.usuario_id = ?`,
+        [usuarioId]
+    );
+    return rows;
+}
+
+// Verificar si un cultivo ya está en favoritos de un usuario
+export async function isFavorite(usuarioId, cultivoId) {
+    const [rows] = await pool.query(
+        `SELECT * FROM favoritos WHERE usuario_id = ? AND cultivo_id = ?`,
+        [usuarioId, cultivoId]
+    );
+    return rows.length > 0;
 }
