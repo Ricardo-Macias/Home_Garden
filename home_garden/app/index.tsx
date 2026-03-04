@@ -14,6 +14,7 @@ import {
 } from "../Redux/authSlice";
 import { RootState, AppDispatch } from "../Redux/store";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+global.Buffer = global.Buffer || require('buffer').Buffer;
 
 export default function Index() {
     const router = useRouter();
