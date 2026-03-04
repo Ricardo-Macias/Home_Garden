@@ -56,4 +56,5 @@ app-example
 api.h
 
 #Control Difuso
+__pycache__
 venv
