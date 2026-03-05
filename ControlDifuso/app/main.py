@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
-from Mandani import mandani
+from app.Mandani import mandani
 
 app = FastAPI()
 
