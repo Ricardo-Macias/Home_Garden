@@ -1,26 +1,19 @@
-import {
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    ScrollView,
-    Dimensions,
-} from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, Stack, useRouter } from "expo-router";
-import { formatDate } from "@/components/utils/formatDate";
 import Constants from "expo-constants";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { getStatusImage } from "../../components/utils/statusImage";
+import { formatDate } from "@/components/utils/formatDate";
 import GardenDetailStyle from "../../styles/GardenDetailStyle";
+import axios from "axios";
+import { usePolling } from "@/hooks/usePolling"; 
 
 interface AppConfig {
     API_URL: string;
 }
 
 const config = Constants.expoConfig?.extra as AppConfig;
-const { width } = Dimensions.get("window");
 
 type SensorResult = {
     valor: number;
@@ -43,7 +36,6 @@ export default function GardenDetail() {
     const router = useRouter();
 
     const [sensorData, setSensorData] = useState<SensorData | null>(null);
-    const [activeIndex, setActiveIndex] = useState(0);
 
     const sensor = Number(params.sensor ?? "");
     const huerto = String(params.huerto ?? "");
@@ -51,7 +43,6 @@ export default function GardenDetail() {
     const imageUrl = String(params.imagen ?? "https://via.placeholder.com/400");
     const inicio = String(params.inicio ?? "");
     const termina = String(params.termina ?? "");
-
     const uploads =
         params.uploads && typeof params.uploads === "string"
             ? JSON.parse(params.uploads)
@@ -59,40 +50,35 @@ export default function GardenDetail() {
 
     const images: string[] = [imageUrl, ...uploads];
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const sensorResponse = await fetch(
-                    `${config.API_URL}/getSensorData/${sensor}`
-                );
-                const sensorRaw = await sensorResponse.json();
+    const { data: sensorRaw, error, loading } = usePolling<any>(
+        `${config.API_URL}/getSensorData/${sensor}`,
+        10000 // tiempo en hacer la consulta
+    );
 
-                const rangesResponse = await fetch(
+    useEffect(() => {
+        const checkRanges = async () => {
+            if (!sensorRaw) return;
+            try {
+                const { data: rangesData } = await axios.post(
                     `${config.API_URL}/checkSensorRanges`,
                     {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            nombreCultivo: cultivo,
-                            sensorData: {
-                                temp: sensorRaw.temperature,
-                                humedadSuelo: sensorRaw.soilMoisture,
-                                humedadAmbiente: sensorRaw.humedity,
-                                luz: sensorRaw.light,
-                            },
-                        }),
+                        nombreCultivo: cultivo,
+                        sensorData: {
+                            temp: sensorRaw.temperature,
+                            humedadSuelo: sensorRaw.soilMoisture,
+                            humedadAmbiente: sensorRaw.humedity,
+                            luz: sensorRaw.light,
+                        },
                     }
                 );
-
-                const rangesData = await rangesResponse.json();
                 setSensorData(rangesData);
-            } catch (error) {
-                console.log("Error al cargar datos: ", error);
+            } catch (err) {
+                console.error("Error al validar rangos:", err);
             }
         };
 
-        fetchData();
-    }, [sensor, cultivo]);
+        checkRanges();
+    }, [sensorRaw, cultivo]);
 
     return (
         <>
@@ -101,9 +87,7 @@ export default function GardenDetail() {
                     title: huerto,
                     headerTitleAlign: "center",
                     headerShadowVisible: false,
-                    headerStyle: {
-                        backgroundColor: "#F2F6F4",
-                    },
+                    headerStyle: { backgroundColor: "#F2F6F4" },
                     headerTitleStyle: {
                         fontSize: 22,
                         fontWeight: "700",
@@ -113,7 +97,7 @@ export default function GardenDetail() {
                         <MaterialCommunityIcons
                             name="arrow-left"
                             size={26}
-                            color= "#27ae60"
+                            color="#27ae60"
                             style={{ marginLeft: 12 }}
                             onPress={() => router.back()}
                         />
@@ -203,19 +187,12 @@ export default function GardenDetail() {
                             />
                         </View>
                     )}
-
-                    {/* Imagen dinámica humedad suelo */}
-                    {sensorData?.humedadSuelo && (
-                        <Image
-                            source={getStatusImage(sensorData.humedadSuelo)}
-                            style={GardenDetailStyle.statusImage}
-                        />
-                    )}
                 </ScrollView>
             </SafeAreaView>
         </>
     );
 }
+
 
 function SensorCard({
     title,
@@ -245,16 +222,17 @@ function SensorCard({
                 return "#555";
         }
     };
+
     const getIconBgColor = () => {
         switch (icon) {
             case "thermometer":
-                return "#FFEBEE"; 
+                return "#FFEBEE";
             case "weather-sunny":
-                return "#FFF8E1"; 
+                return "#FFF8E1";
             case "water-percent":
-                return "#E3F2FD"; 
+                return "#E3F2FD";
             case "sprout":
-                return "#E8F5E9"
+                return "#E8F5E9";
             default:
                 return "#F5F5F5";
         }

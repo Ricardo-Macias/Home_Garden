@@ -23,6 +23,7 @@ import {
 
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import { 
     addHomeVegetableGarden,
@@ -39,6 +40,7 @@ import {
 
 import cultivoRoutes from "./routes/cultivo.js";
 
+import favoritos from "./routes/favoritos.js";
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -60,6 +62,8 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage })
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * USUARIO
@@ -92,6 +96,7 @@ app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
  * CULTIVO
 */
 app.use(cultivoRoutes);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 /*
     Subir Imagen
@@ -117,6 +122,12 @@ app.get("/getSensorData/:idSensor", getSensorData);
  * PERFIL
 */
 app.use(perfilRoutes);
+
+/**
+ * FAVORITOS
+*/
+
+app.use("/favoritos", favoritos);
 
 
 app.listen(8080, () => {

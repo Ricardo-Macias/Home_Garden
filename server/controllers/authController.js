@@ -58,7 +58,7 @@ export async function register(req, res) {
             return res.status(400).json({ error: "Este correo ya está registrado." });
         }
 
-        const result = await insertUser(nombre, apellidos, correo, pass);
+        await insertUser(nombre, apellidos, correo, pass);
 
         return res.status(201).json({
             message: "Usuario creado correctamente"

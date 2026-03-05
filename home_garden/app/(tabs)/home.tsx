@@ -11,9 +11,10 @@ import HomeGardenGrid from "@/components/Home/HomeGardenGrid";
 import homeStyle from "../../styles/homeStyles";
 import { useAppSelector } from "../../Redux/store";
 import { ImageBackground } from "expo-image";
-import homeStyles from "../../styles/homeStyles";
 import { getWeatherCategory, getRandomWeatherImage } from "../../components/utils/weatherImages";
 import { getWeatherIcon } from "../../components/utils/weatherIcons";
+import axios from "axios";
+import { useClockPolling } from "@/hooks/useClockPolling";
 
 interface AppConfig {
     API_URL: string;
@@ -33,32 +34,10 @@ export default function Home() {
     const [huertos, setHuertos] = useState<any[]>([]);
     const [userId, setUserId] = useState<number | null>(null);
 
-    // Fecha y hora 
-    const [currentTime, setCurrentTime] = useState<Date | null>(null);
-
-    useEffect(() => {
-        const fetchTime = async () => {
-            try {
-                const response = await fetch("https://timeapi.io/api/Time/current/zone?timeZone=America/Mexico_City");
-                const data = await response.json();
-                const serverTime = new Date(data.dateTime);
-                setCurrentTime(serverTime);
-            } catch (error) {
-                console.error("Error al cargar hora:", error);
-            }
-        };
-
-        fetchTime();
-
-        const interval = setInterval(() => {
-            setCurrentTime(prev => prev ? new Date(prev.getTime() + 1000) : null);
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
+    // fecha y hora
+    const currentTime = useClockPolling("America/Mexico_City", 1000);
 
     const mesesAbrev = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-
     const dia = currentTime ? currentTime.getDate() : "";
     const mes = currentTime ? mesesAbrev[currentTime.getMonth()] : "";
     const año = currentTime ? currentTime.getFullYear() : "";
@@ -68,13 +47,16 @@ export default function Home() {
         ? currentTime.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
         : "";
 
-    // Clima
+    // Estados de clima
     const [humidity, setHumidity] = useState<number | null>(null);
     const [temperature, setTemperature] = useState<number | null>(null);
     const [weather, setWeather] = useState<string>("");
+    const [weatherCode, setWeatherCode] = useState<number | null>(null);
 
-    const category = getWeatherCategory(weather);
-    const weatherImage = getRandomWeatherImage(category);
+    // Categoria e imagen basadas en código
+    const category = weatherCode ? getWeatherCategory(weatherCode) : "default";
+    const weatherImage = weatherCode ? getRandomWeatherImage(weatherCode) : null;
+
     const weatherIconName = getWeatherIcon(weather);
 
     const user = useAppSelector((state) => state.auth.user);
@@ -94,13 +76,15 @@ export default function Home() {
     }, [sendCredentials]);
 
     // Imagen del clima
-    const [weatherImageFixed, setWeatherImageFixed] = useState(getRandomWeatherImage(weather));
+    const [weatherImageFixed, setWeatherImageFixed] = useState(
+        weatherCode ? getRandomWeatherImage(weatherCode) : null
+    );
 
     useEffect(() => {
-        if (weather) {
-            setWeatherImageFixed(getRandomWeatherImage(weather));
+        if (weatherCode) {
+            setWeatherImageFixed(getRandomWeatherImage(weatherCode));
         }
-    }, [weather]);
+    }, [weatherCode]);
 
     // Cargar usuario
     useEffect(() => {
@@ -120,11 +104,8 @@ export default function Home() {
 
         const fetchData = async () => {
             try {
-                const response = await fetch(
-                    `${config.API_URL}/allHomeVegetableGarden/${userId}`
-                );
-                const data = await response.json();
-                setHuertos(Array.isArray(data) ? data : []);
+                const response = await axios.get(`${config.API_URL}/allHomeVegetableGarden/${userId}`);
+                setHuertos(Array.isArray(response.data) ? response.data : []);
             } catch (error) {
                 console.error("Error al cargar huertos:", error);
                 setHuertos([]);
@@ -138,15 +119,23 @@ export default function Home() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const response = await fetch(
+                const response = await axios.get(
                     `https://api.openweathermap.org/data/2.5/weather?lat=20.7167&lon=-103.4&units=metric&appid=${config.WEATHER_API_KEY}&lang=es`
                 );
 
-                const data = await response.json();
+                const data = response.data;
 
+                // Guardamos temperatura y humedad
                 setTemperature(data.main?.temp ?? null);
                 setHumidity(data.main?.humidity ?? null);
+
                 setWeather(data.weather?.[0]?.description ?? "");
+
+                setWeatherCode(data.weather?.[0]?.id ?? null);
+
+                // Debug para verificar
+                console.log("Weather code:", data.weather?.[0]?.id);
+                console.log("Category:", getWeatherCategory(data.weather?.[0]?.id));
             } catch (error) {
                 console.error("Error al cargar clima:", error);
             }
@@ -217,7 +206,6 @@ export default function Home() {
                     imageStyle={{ borderRadius: 16 }}
                 >
                     <View style={homeStyle.weatherContent}>
-                        {/* Parte izquierda */}
                         <View style={homeStyle.weatherLeft}>
                             <View style={homeStyle.weatherRow}>
                                 <MaterialIcons
@@ -237,7 +225,6 @@ export default function Home() {
                             </Text>
                         </View>
 
-                        {/* Parte derecha */}
                         <View style={homeStyle.weatherRight}>
                             <Text style={homeStyle.weatherTime}>{shortTime}</Text>
                             <Text style={homeStyle.weatherDate}>{shortDate}</Text>
@@ -289,11 +276,12 @@ export default function Home() {
                 <MaterialIcons name="add" size={28} color="#fff" />
             </TouchableOpacity>
 
-            <Image
+            {/* pie de pagina */}
+            {/*<Image
                 source={require("../../assets/images/garden_footer.png")}
                 style={homeStyles.footerImage}
                 resizeMode="cover"
-            />
+            /> */}
         </View>
     );
 }
