@@ -1,50 +1,81 @@
 const weatherImages: Record<string, any[]> = {
-    soleado: [
-        require("../../assets/images/weather/cielo_claro.png"),
+    thunderstorm: [
+        require("../../assets/images/weather/thunderstorm_day.png"),
     ],
-    soleado_noche: [
-        require("../../assets/images/weather/sunny_noche.png"),
+    thunderstorm_noche: [
+        require("../../assets/images/weather/thunderstorm_night.png"),
     ],
-    nublado: [
-        require("../../assets/images/weather/cloudy1.png"),
+    drizzle: [
+        require("../../assets/images/weather/drizzle_day.png"),
     ],
-    nublado_noche: [
-        require("../../assets/images/weather/cloudy1.png"),
+    drizzle_noche: [
+        require("../../assets/images/weather/drizzle_night.png"),
     ],
-    lluvia: [
-        require("../../assets/images/weather/rain1.png"),
+    rain: [
+        require("../../assets/images/weather/rain_day.png"),
     ],
-    lluvia_noche: [
-        require("../../assets/images/weather/rain1.png"),
+    rain_noche: [
+        require("../../assets/images/weather/rain_night.png"),
     ],
-    tormenta: [
-        require("../../assets/images/weather/storm1.png"),
+    atmosphere: [
+        require("../../assets/images/weather/fog_day.png"),
     ],
-    tormenta_noche: [
-        require("../../assets/images/weather/storm1.png"),
+    atmosphere_noche: [
+        require("../../assets/images/weather/fog_night.png"),
+    ],
+    clear: [
+        require("../../assets/images/weather/clear_day.png"),
+    ],
+    clear_noche: [
+        require("../../assets/images/weather/clear_night.png"),
+    ],
+    clouds_few: [
+        require("../../assets/images/weather/clouds_few_day.png"),
+    ],
+    clouds_few_noche: [
+        require("../../assets/images/weather/clouds_few_night.png"),
+    ],
+    clouds_scattered: [
+        require("../../assets/images/weather/clouds_scattered_day.png"),
+    ],
+    clouds_scattered_noche: [
+        require("../../assets/images/weather/clouds_scattered_day.png"),
+    ],
+    clouds_broken: [
+        require("../../assets/images/weather/clouds_broken_day.png"),
+    ],
+    clouds_broken_noche: [
+        require("../../assets/images/weather/clouds_broken_day.png"),
+    ],
+    clouds_overcast: [
+        require("../../assets/images/weather/clouds_overcast_day.png"),
+    ],
+    clouds_overcast_noche: [
+        require("../../assets/images/weather/clouds_overcast_day.png"),
     ],
     default: [require("../../assets/images/weather/default.png")],
 };
 
-// Categorizar clima
-export function getWeatherCategory(description: string): string {
-    const desc = description.toLowerCase();
-    if (desc.includes("sol") || desc.includes("claro")) return "soleado";
-    if (desc.includes("nube")) return "nublado";
-    if (desc.includes("lluvia")) return "lluvia";
-    if (desc.includes("tormenta")) return "tormenta";
+export function getWeatherCategory(code: number): string {
+    if (code >= 200 && code < 300) return "thunderstorm"; // Tormentas
+    if (code >= 300 && code < 400) return "drizzle"; // Llovizna
+    if (code >= 500 && code < 600) return "rain"; // Lluvia
+    if (code >= 700 && code < 800) return "atmosphere"; // Niebla, bruma
+    if (code === 800) return "clear"; // Despejado
+    if (code === 801) return "clouds_few"; // pocas nubes
+    if (code === 802) return "clouds_scattered"; // nubes dispersas
+    if (code === 803) return "clouds_broken"; // cielo parcialmente cubierto
+    if (code === 804) return "clouds_overcast"; // cielo totalmente cubierto
+
     return "default";
 }
 
-// Obtener imagen aleatoria según clima y hora
-export function getRandomWeatherImage(description: string): any {
-    const category = getWeatherCategory(description);
+export function getRandomWeatherImage(code: number): any {
+    const category = getWeatherCategory(code);
 
-    // Detectar hora actual
     const hour = new Date().getHours();
     const isNight = hour >= 19 || hour < 6; // noche entre 7pm y 6am
 
-    // Si hay versión nocturna, usarla
     const categoryKey = isNight ? `${category}_noche` : category;
 
     const images = weatherImages[categoryKey] || weatherImages["default"];
