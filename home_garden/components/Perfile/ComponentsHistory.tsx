@@ -75,7 +75,6 @@ export default function ComponentsHistory({ historial }: Props) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Historial de Huertos</Text>
             <Text style={styles.subtitle}>
                 Huertos terminados: {historial?.length ?? 0}
             </Text>
@@ -86,7 +85,7 @@ export default function ComponentsHistory({ historial }: Props) {
                 renderItem={renderItem}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
-                    <Text style={styles.empty}>No hay historial de huertos</Text>
+                    <Text style={styles.empty}> . </Text>
                 }
             />
 

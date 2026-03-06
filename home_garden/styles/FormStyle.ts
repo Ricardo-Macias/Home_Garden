@@ -1,13 +1,15 @@
 import { StyleSheet } from "react-native";
+import { colors } from "./colors";
 
 const FormStyle = StyleSheet.create({
     // Comtenedor del formulario
     container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        paddingHorizontal: 24,
-        paddingTop: 60,
         alignItems: "center",
+        flex: 1,
+        backgroundColor: colors.background,
+        paddingHorizontal: 24,
+        paddingTop: 20,
+        paddingBottom: 200, 
     },
     title: {
         fontSize: 26,
@@ -113,6 +115,85 @@ const FormStyle = StyleSheet.create({
         fontSize: 14,
         color: "#6A1B9A",
         fontWeight: "bold",
+    },
+
+    // Estilos de agregar sensor
+    safeArea: {
+        flex: 1,
+        backgroundColor: colors.background,
+    },
+    customHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 20,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "600",
+        color: colors.text,
+        marginLeft: 12,
+    },
+    content: {
+        flex: 1,
+    },
+    ImageContainer: {
+        alignItems: "center",
+        marginBottom: 24,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: colors.text,
+        marginBottom: 6,
+    },
+    InputContainer: {
+        borderWidth: 1,
+        borderColor: "#E8E8E8",
+        borderRadius: 14,
+        paddingHorizontal: 14,
+        marginBottom: 18,
+        backgroundColor: colors.cardBackground,
+        height: 52,
+        justifyContent: "center",
+        elevation: 2,
+    },
+    TextInput: {
+        fontSize: 16,
+        color: colors.text,
+    },
+    DropDownWrapper: {
+        marginBottom: 20,
+        zIndex: 1000,
+    },
+    dropdown: {
+        borderColor: "#E8E8E8",
+        borderRadius: 14,
+        backgroundColor: colors.cardBackground,
+        elevation: 2,
+    },
+    dropdownContainer: {
+        borderColor: "#E8E8E8",
+        borderRadius: 14,
+    },
+    Button: {
+        backgroundColor: colors.primary,
+        borderRadius: 16,
+        paddingVertical: 16,
+        alignItems: "center",
+        marginTop: 30,
+        elevation: 6,
+    },
+    textButton: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "600",
+        letterSpacing: 0.5,
+    },
+    footerImage: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        height: 180,
     },
 });
 

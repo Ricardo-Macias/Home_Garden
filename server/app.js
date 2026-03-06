@@ -23,6 +23,7 @@ import {
 
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import { 
     addHomeVegetableGarden,
@@ -37,6 +38,10 @@ import {
     getSensorData,
     mandani
 } from "./controllers/sensorController.js"
+
+import cultivoRoutes from "./routes/cultivo.js";
+
+import favoritos from "./routes/favoritos.js";
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -58,6 +63,8 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage })
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * USUARIO
@@ -89,13 +96,8 @@ app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 /**
  * CULTIVO
 */
-
-app.get("/searchIdCrop/:nombre", searchIdCrop);
-app.get("/durationCrop/:nombre", durationCrop);
-app.get("/crop", async (req, res) => {
-    const crop = await getAllCrop();
-    res.status(200).send(crop);
-});
+app.use(cultivoRoutes);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 /*
     Subir Imagen
@@ -127,6 +129,12 @@ app.use(perfilRoutes);
  */
 
 app.post("/should-water", mandani);
+
+/*
+ * FAVORITOS
+*/
+
+app.use("/favoritos", favoritos);
 
 
 app.listen(8080, () => {

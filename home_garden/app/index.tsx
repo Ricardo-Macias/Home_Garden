@@ -15,6 +15,7 @@ import {
 import { RootState, AppDispatch } from "../Redux/store";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 global.Buffer = global.Buffer || require('buffer').Buffer;
+import PlantLoader from "../components/Loader";
 
 export default function Index() {
     const router = useRouter();
@@ -58,11 +59,11 @@ export default function Index() {
         }
     }, [checkingSession, navigationState, accessToken, user]);
 
-    // Mientras se revisa sesión, monstrara loader
+    // Loader
     if (checkingSession) {
         return (
-            <SafeAreaProvider style={{ flex: 1, backgroundColor: "#fff", justifyContent:"center", alignItems:"center" }}>
-                <ActivityIndicator size="large" />
+            <SafeAreaProvider style={{ flex: 1 }}>
+                <PlantLoader />
             </SafeAreaProvider>
         );
     }
