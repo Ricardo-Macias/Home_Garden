@@ -35,7 +35,8 @@ import {
 
 import {
     sensorData,
-    getSensorData
+    getSensorData,
+    mandani
 } from "./controllers/sensorController.js"
 
 import cultivoRoutes from "./routes/cultivo.js";
@@ -124,6 +125,12 @@ app.get("/getSensorData/:idSensor", getSensorData);
 app.use(perfilRoutes);
 
 /**
+ * FASTAPI
+ */
+
+app.post("/should-water", mandani);
+
+/*
  * FAVORITOS
 */
 

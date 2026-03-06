@@ -20,5 +20,11 @@ services:
       - ./uploads:/app/uploads
     depends_on:
       - db
+  python:
+    build: ./ControlDifuso
+    container_name: fastapi
+    restart: always
+    ports:
+      - "8000:8000"
 volumes:
   db_data:

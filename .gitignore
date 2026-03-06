@@ -54,3 +54,7 @@ app-example
 
 #esp32
 api.h
+
+#Control Difuso
+__pycache__
+venv
