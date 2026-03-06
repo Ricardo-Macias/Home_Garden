@@ -1,8 +1,12 @@
+import dotenv from 'dotenv';
+import axios from 'axios';
 import {
     searchForSensorByName,
     lastValueRecordedSensorData,
     insertSensorData
 } from "../database.js";
+
+dotenv.config();
 
 export async function sensorData(req, res){
     const {
@@ -39,5 +43,26 @@ export async function getSensorData(req, res){
         });
     } catch(error) {
         console.log("Error al cargar datos del sensor: ", error);
+    }
+}
+
+export async function mandani(req, res){
+    const {
+        soilMoisture,
+        temperature,
+        humidity,
+        light
+    } = req.body;
+    try{
+        const response = await axios.post(process.env.API_URL + "/should-water", {
+            soilMoisture: soilMoisture,
+            temperature: temperature,
+            humidity: humidity,
+            light: light
+        });
+
+        res.json(response.data);
+    } catch(error){
+        console.log("Error en mandani", error);
     }
 }

@@ -34,7 +34,8 @@ import {
 
 import {
     sensorData,
-    getSensorData
+    getSensorData,
+    mandani
 } from "./controllers/sensorController.js"
 
 const corsOptions = {
@@ -120,6 +121,12 @@ app.get("/getSensorData/:idSensor", getSensorData);
  * PERFIL
 */
 app.use(perfilRoutes);
+
+/**
+ * FASTAPI
+ */
+
+app.post("/should-water", mandani);
 
 
 app.listen(8080, () => {
