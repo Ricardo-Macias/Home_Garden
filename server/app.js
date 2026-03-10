@@ -90,6 +90,7 @@ app.post("/addSensor", addSensor);
  * HUERTO
 */
 
+app.get("/durationCrop/:nombre", durationCrop);
 app.post("/addHomeVegetableGarden", addHomeVegetableGarden);
 app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 
@@ -98,6 +99,7 @@ app.get("/allHomeVegetableGarden/:id", allHomeVegetableGarden);
 */
 app.use(cultivoRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
+app.get("/searchIdCrop/:name", searchIdCrop);
 
 /*
     Subir Imagen

@@ -10,7 +10,8 @@ import {
 export async function searchIdCrop(req, res){
 
     try {
-        const result = await getIdCrop(req.params.nombre);
+        console.log(req.params.name);
+        const result = await getIdCrop(req.params.name);
         res.json({
             idCrop: result
         });

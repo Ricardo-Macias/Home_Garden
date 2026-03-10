@@ -82,7 +82,7 @@ export default function FormSensor(){
     const searchIdCrop = async () => {
         const response = await fetch(`${config.API_URL}/searchIdCrop/${value}`);
         const data = await response.json();
-        return data.idCrop;
+        return data.id;
     };
 
     const estimatedDate = async () => {
