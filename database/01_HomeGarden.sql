@@ -50,15 +50,6 @@ CREATE TABLE IF NOT EXISTS huerto (
     FOREIGN KEY(idCultivo) REFERENCES cultivo(id)
 );
 
-CREATE TABLE IF NOT EXISTS huerto_imagen (
-    idImagen INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    idHuerto INT NOT NULL,
-    rutaImagen VARCHAR(180) NOT NULL,
-    fechaCaptura DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(idHuerto) REFERENCES huerto(idHuerto)
-);
-
-
 CREATE TABLE IF NOT EXISTS sensor_data (
     idSensorData INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idSensor INT NOT NULL,

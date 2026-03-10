@@ -20,7 +20,7 @@ CREATE VIEW vista_historial_huertos AS SELECT
         c.nombre AS cultivo,
         c.tipo AS tipo,
         c.dificultad AS dificultad,
-        c.duracion AS duracion
+        c.duracion AS duracion,
         h.imagen AS imagen,
         h.fechaInicio AS fechaInicio,
         h.fechaEstimada AS fechaFin
