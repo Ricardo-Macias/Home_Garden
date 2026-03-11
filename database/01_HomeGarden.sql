@@ -61,3 +61,12 @@ CREATE TABLE IF NOT EXISTS sensor_data (
     hora TIME DEFAULT(CURTIME()),
     FOREIGN KEY(idSensor) REFERENCES sensor(idSensor)
 );
+
+CREATE TABLE IF NOT EXISTS favoritos (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    cultivo_id INT NOT NULL,
+    fecha_agregada DATE DEFAULT(CURDATE()),
+    FOREIGN KEY(usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY(cultivo_id) REFERENCES cultivo(id)
+);
