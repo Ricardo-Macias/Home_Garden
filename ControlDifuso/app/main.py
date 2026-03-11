@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from app.Mandani import mandani
 
 app = FastAPI()
@@ -13,7 +13,8 @@ class SensorData(BaseModel):
 
 @app.post("/should-water")
 def should_water(data: SensorData):
-    hour = datetime.now().hour
+    time_zone = timezone(timedelta(hours=-6))
+    hour = datetime.now(time_zone).hour
 
     if hour in [0, 6, 12, 18]:
         seconds = mandani(data.soilMoisture, data.temperature, data.light, data.humidity)

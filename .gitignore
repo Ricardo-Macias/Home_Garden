@@ -50,7 +50,7 @@ app-example
 /android
 
 # Image
-/server/uploads
+uploads/*.jpg
 
 #esp32
 api.h

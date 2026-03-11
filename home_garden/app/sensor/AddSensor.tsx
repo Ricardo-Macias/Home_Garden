@@ -24,7 +24,7 @@ const PlaceholderImage = require("../../assets/images/Predeterminada.png");
 
 export default function FormSensor(){
     const [name, setName] = useState("");
-    const [image, setImage] = useState<string | null>(null); 
+    const [image, setImage] = useState<string | null>("Predeterminada.png"); 
     const {sensor} = useLocalSearchParams();
     const router = useRouter();
     const navigation = useNavigation();
@@ -82,7 +82,7 @@ export default function FormSensor(){
     const searchIdCrop = async () => {
         const response = await fetch(`${config.API_URL}/searchIdCrop/${value}`);
         const data = await response.json();
-        return data.idCrop;
+        return data.id;
     };
 
     const estimatedDate = async () => {
