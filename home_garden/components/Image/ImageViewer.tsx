@@ -1,5 +1,11 @@
-import { StyleSheet } from "react-native";
 import { Image } from "expo-image";
+import Constants from "expo-constants";
+
+interface AppConfig {
+    API_URL: string;
+}
+
+const config = Constants.expoConfig?.extra as AppConfig;
 
 type Props = {
     theme: "predetermined" | "photo";
@@ -10,12 +16,12 @@ type Props = {
 
 export default function ImageViewer({ theme, imgSource, sizeWidth, sizeHeight }: Props){
     if (theme === "predetermined"){
-        return <Image source={imgSource} style={{width: sizeWidth, height: sizeHeight}}/>
+        return <Image source={`${config.API_URL}/uploads/Predeterminada.png`} style={{width: sizeWidth, height: sizeHeight}}/>
     }
 
     if (theme === "photo"){
         return <Image
-            source={imgSource}
+            source={`${config.API_URL}/uploads/${imgSource}`}
             style={{
                 width: sizeWidth,
                 height: sizeHeight,
