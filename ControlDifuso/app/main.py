@@ -16,7 +16,7 @@ def should_water(data: SensorData):
     time_zone = timezone(timedelta(hours=-6))
     hour = datetime.now(time_zone).hour
 
-    if hour in [0, 6, 12, 18]:
+    if hour in [9, 16]:
         seconds = mandani(data.soilMoisture, data.temperature, data.light, data.humidity)
 
         return {'irrigation': True, 'seconds': seconds}
