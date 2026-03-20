@@ -34,7 +34,7 @@ export async function sensorData(req, res){
 export async function getSensorData(req, res){
 
     try {
-        const [result] = await lastValueRecordedSensorData(req.params.idSensor);
+        const result = await lastValueRecordedSensorData(req.params.idSensor);
         res.json({
             temperature: result.temperatura,
             humedity: result.humedadAmbiente,

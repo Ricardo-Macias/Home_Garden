@@ -294,7 +294,7 @@ void setup() {
 } 
 
 void loop() { 
-
+  
   if(millis() - lastReadingTime >= readingInterval){
     Sensors value = readSensors();
 
@@ -336,7 +336,7 @@ void loop() {
     }
 
     
-    if ((hour == 0 || hour == 6 || hour == 12 || hour == 18) && minutes == 0 && hour != lastHour && !watered){ 
+    if ((hour == 9 || hour == 16) && hour != lastHour && !watered){ 
       wateringTime = fuzzy(value.soilMoisture, value.temperature, value.lux, value.humidity);
       lastHour = hour;
       irrigationStart = millis();
