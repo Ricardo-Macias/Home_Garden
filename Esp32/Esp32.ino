@@ -294,7 +294,7 @@ void setup() {
 } 
 
 void loop() { 
-
+  
   if(millis() - lastReadingTime >= readingInterval){
     Sensors value = readSensors();
 
