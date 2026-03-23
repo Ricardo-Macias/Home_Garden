@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     Modal,
     Image,
-    ScrollView, 
+    ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
@@ -16,6 +16,7 @@ import { formatDate } from "@/components/utils/formatDate";
 const API_URL = Constants.expoConfig?.extra?.API_URL;
 
 interface HistorialItem {
+    idHuerto: number;
     huerto: string;
     cultivo: string;
     tipo?: string;
@@ -30,17 +31,16 @@ interface Props {
 }
 
 export default function ComponentsHistory({ historial }: Props) {
-    const [selectedItem, setSelectedItem] = useState<
-        (HistorialItem & { numero: number }) | null
-    >(null);
 
-    const handleSelect = (item: HistorialItem, index: number) => {
-        setSelectedItem({ ...item, numero: index + 1 });
+    const [selectedItem, setSelectedItem] = useState<HistorialItem | null>(null);
+
+    const handleSelect = (item: HistorialItem) => {
+        setSelectedItem(item);
     };
 
     const closeModal = () => setSelectedItem(null);
 
-    const renderItem = ({ item, index }: { item: HistorialItem; index: number }) => {
+    const renderItem = ({ item }: { item: HistorialItem }) => {
         const imageUrl = item.imagen
             ? `${API_URL}/uploads/${item.imagen}`
             : "https://via.placeholder.com/100x100.png?text=Huerto";
@@ -48,26 +48,15 @@ export default function ComponentsHistory({ historial }: Props) {
         return (
             <TouchableOpacity
                 style={styles.card}
-                onPress={() => handleSelect(item, index)}
+                onPress={() => handleSelect(item)}
                 activeOpacity={0.9}
             >
-                <Image
-                    source={{ uri: imageUrl }}
-                    style={styles.image}
-                    resizeMode="cover"
-                />
-
+                <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
                 <View style={styles.info}>
-                    <Text style={styles.cardTitle}>
-                        {item.huerto || `Huerto ${index + 1}`}
-                    </Text>
+                    <Text style={styles.cardTitle}>{item.huerto}</Text>
                     <Text style={styles.text}>Cultivo: {item.cultivo}</Text>
-                    <Text style={styles.text}>
-                        Inicio: {formatDate(item.fechaInicio)}
-                    </Text>
-                    <Text style={styles.text}>
-                        Fin: {formatDate(item.fechaFin)}
-                    </Text>
+                    <Text style={styles.text}>Inicio: {formatDate(item.fechaInicio)}</Text>
+                    <Text style={styles.text}>Fin: {formatDate(item.fechaFin)}</Text>
                 </View>
             </TouchableOpacity>
         );
@@ -81,15 +70,13 @@ export default function ComponentsHistory({ historial }: Props) {
 
             <FlatList
                 data={historial}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={(item) => item.idHuerto.toString()}
                 renderItem={renderItem}
                 showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                    <Text style={styles.empty}> . </Text>
-                }
+                ListEmptyComponent={<Text style={styles.empty}>No hay huertos terminados.</Text>}
             />
 
-            {/* Modal */}
+            {/* Modal detalle */}
             <Modal
                 visible={!!selectedItem}
                 transparent
@@ -98,7 +85,7 @@ export default function ComponentsHistory({ historial }: Props) {
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        {/* Botón de cerrar */}
+                        {/* Boton de cerrar */}
                         <View style={styles.modalHeader}>
                             <TouchableOpacity onPress={closeModal}>
                                 <Ionicons name="close-circle" size={28} color="#673AB7" />
@@ -108,7 +95,7 @@ export default function ComponentsHistory({ historial }: Props) {
                         {selectedItem && (
                             <ScrollView style={{ width: "100%" }}>
                                 <View style={styles.modalBody}>
-                                    {/* Imagen centrada */}
+                                    {/* Imagen */}
                                     <Image
                                         source={{
                                             uri: selectedItem.imagen
@@ -119,12 +106,10 @@ export default function ComponentsHistory({ historial }: Props) {
                                         resizeMode="cover"
                                     />
 
-                                    {/* Nombre del huerto centrado */}
-                                    <Text style={styles.modalTitle}>
-                                        {selectedItem.huerto}
-                                    </Text>
+                                    {/* Nombre del huerto */}
+                                    <Text style={styles.modalTitle}>{selectedItem.huerto}</Text>
 
-                                    {/* Información alineada a la izquierda */}
+                                    {/* Informacion */}
                                     <View style={styles.infoBlock}>
                                         <Text style={styles.modalText}>
                                             <Ionicons name="leaf-outline" size={18} color="#4CAF50" /> Cultivo:{" "}
@@ -175,10 +160,11 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: "row",
-        backgroundColor: "#E6E6FA",
+        backgroundColor: "#ffffff",
+        borderRadius: 12,
+        marginBottom: 12,
         padding: 10,
-        borderRadius: 8,
-        marginBottom: 18,
+        elevation: 2,
         width: "95%",
         alignSelf: "center",
         alignItems: "center",
@@ -218,7 +204,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 12,
         width: "85%",
-        maxHeight: "80%", 
+        maxHeight: "80%",
     },
     modalHeader: {
         flexDirection: "row",

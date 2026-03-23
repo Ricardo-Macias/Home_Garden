@@ -11,3 +11,19 @@ export const formatDate = (dateString?: string): string => {
         year: "numeric",
     });
 };
+
+export const formatTime = (timeString?: string): string => {
+    if (!timeString) return "—";
+
+    const [hours, minutes, seconds] = timeString.split(":");
+
+    const date = new Date();
+    date.setHours(Number(hours));
+    date.setMinutes(Number(minutes));
+    date.setSeconds(Number(seconds));
+
+    return date.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};

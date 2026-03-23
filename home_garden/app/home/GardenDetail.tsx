@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 import Constants from "expo-constants";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { formatDate } from "@/components/utils/formatDate";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { formatDate, formatTime } from "@/components/utils/formatDate";
 import GardenDetailStyle from "../../styles/GardenDetailStyle";
 import axios from "axios";
-import { usePolling } from "@/hooks/usePolling"; 
+import { usePolling } from "@/hooks/usePolling";
 
 interface AppConfig {
     API_URL: string;
@@ -29,13 +29,14 @@ type SensorData = {
     luz: SensorResult;
 };
 
-type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
-
 export default function GardenDetail() {
     const params = useLocalSearchParams();
     const router = useRouter();
 
     const [sensorData, setSensorData] = useState<SensorData | null>(null);
+    const [ultimoRiego, setUltimoRiego] = useState<any | null>(null);
+
+    const id = String(params.id ?? "");
 
     const sensor = Number(params.sensor ?? "");
     const huerto = String(params.huerto ?? "");
@@ -43,6 +44,9 @@ export default function GardenDetail() {
     const imageUrl = String(params.imagen ?? "https://via.placeholder.com/400");
     const inicio = String(params.inicio ?? "");
     const termina = String(params.termina ?? "");
+
+    const horasRiego = ["09:00 AM", "04:00 PM"];
+
     const uploads =
         params.uploads && typeof params.uploads === "string"
             ? JSON.parse(params.uploads)
@@ -50,14 +54,15 @@ export default function GardenDetail() {
 
     const images: string[] = [imageUrl, ...uploads];
 
-    const { data: sensorRaw, error, loading } = usePolling<any>(
+    const { data: sensorRaw } = usePolling<any>(
         `${config.API_URL}/getSensorData/${sensor}`,
-        10000 // tiempo en hacer la consulta
+        10000
     );
 
     useEffect(() => {
         const checkRanges = async () => {
             if (!sensorRaw) return;
+
             try {
                 const { data: rangesData } = await axios.post(
                     `${config.API_URL}/checkSensorRanges`,
@@ -71,6 +76,7 @@ export default function GardenDetail() {
                         },
                     }
                 );
+
                 setSensorData(rangesData);
             } catch (err) {
                 console.error("Error al validar rangos:", err);
@@ -79,6 +85,24 @@ export default function GardenDetail() {
 
         checkRanges();
     }, [sensorRaw, cultivo]);
+
+    useEffect(() => {
+        const fetchUltimoRiego = async () => {
+            if (!id) return;
+
+            try {
+                const response = await axios.get(
+                    `${config.API_URL}/getUltimoRiego/${id}`
+                );
+
+                setUltimoRiego(response.data);
+            } catch (error) {
+                console.error("Error al cargar ultimo riego:", error);
+            }
+        };
+
+        fetchUltimoRiego();
+    }, [id]);
 
     return (
         <>
@@ -110,17 +134,15 @@ export default function GardenDetail() {
                     contentContainerStyle={GardenDetailStyle.container}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* HERO */}
                     <View style={GardenDetailStyle.heroContainer}>
                         <ScrollView
                             horizontal
                             pagingEnabled
                             showsHorizontalScrollIndicator={false}
-                            scrollEventThrottle={16}
                         >
                             {images.map((img, index) => (
                                 <Image
-                                    key={index}
+                                    key={`${img}-${index}`}
                                     source={{ uri: img }}
                                     style={GardenDetailStyle.heroImage}
                                 />
@@ -134,31 +156,27 @@ export default function GardenDetail() {
                     {/* Fechas */}
                     <View style={GardenDetailStyle.section}>
                         <View style={GardenDetailStyle.row}>
-                            <View style={GardenDetailStyle.dateIconContainer}>
-                                <Image
-                                    source={require("../../assets/images/icons/start.png")}
-                                    style={GardenDetailStyle.dateIcon}
-                                />
-                            </View>
+                            <Image
+                                source={require("../../assets/images/icons/start.png")}
+                                style={GardenDetailStyle.dateIcon}
+                            />
                             <Text style={GardenDetailStyle.fecha}>
                                 Inicio: {formatDate(inicio)}
                             </Text>
                         </View>
 
                         <View style={GardenDetailStyle.row}>
-                            <View style={GardenDetailStyle.dateIconContainer}>
-                                <Image
-                                    source={require("../../assets/images/icons/end.png")}
-                                    style={GardenDetailStyle.dateIcon}
-                                />
-                            </View>
+                            <Image
+                                source={require("../../assets/images/icons/end.png")}
+                                style={GardenDetailStyle.dateIcon}
+                            />
                             <Text style={GardenDetailStyle.fecha}>
                                 Fin estimado: {formatDate(termina)}
                             </Text>
                         </View>
                     </View>
 
-                    {/* Tarjetas sensores */}
+                    {/* Sensores */}
                     {sensorData && (
                         <View style={GardenDetailStyle.cardsContainer}>
                             <SensorCard
@@ -187,6 +205,45 @@ export default function GardenDetail() {
                             />
                         </View>
                     )}
+
+                    <View style={GardenDetailStyle.section}>
+                        <Text style={GardenDetailStyle.sectionTitle}>
+                            Horarios de evaluación de riego
+                        </Text>
+                        {horasRiego.map((hora, index) => (
+                            <View key={index} style={GardenDetailStyle.row}>
+                                <Ionicons name="time-outline" size={20} color="#27ae60" />
+                                <Text style={GardenDetailStyle.fecha}>{hora}</Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    {ultimoRiego && (
+                        <View style={GardenDetailStyle.section}>
+                            <View style={GardenDetailStyle.rowBetween}>
+                                <Text style={GardenDetailStyle.sectionTitle}>
+                                    Historial de regado
+                                </Text>
+
+                                <Ionicons
+                                    name="list-outline"
+                                    size={24}
+                                    color="#27ae60"
+                                    onPress={() =>
+                                        router.push({
+                                            pathname: "/home/HistorialRiego",
+                                            params: { id },
+                                        })
+                                    }
+                                />
+                            </View>
+
+                            <Text style={GardenDetailStyle.fecha}>
+                                {formatDate(ultimoRiego.fecha)} {formatTime(ultimoRiego.hora)} — {ultimoRiego.duracion} seg
+                            </Text>
+
+                        </View>
+                    )}
                 </ScrollView>
             </SafeAreaView>
         </>
@@ -201,14 +258,17 @@ function SensorCard({
     unit,
 }: {
     title: string;
-    icon: IconName;
+    icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
     data: SensorResult;
     unit: string;
 }) {
     const isOk = data.estado === "ok";
     const valueColor = isOk ? "#2E7D32" : "#D32F2F";
 
+    const isNight = new Date().getHours() >= 19 || new Date().getHours() < 6;
+
     const getIconColor = () => {
+        if (title === "Luz" && isNight) return "#1565C0";
         switch (icon) {
             case "thermometer":
                 return "#E53935";
@@ -224,6 +284,7 @@ function SensorCard({
     };
 
     const getIconBgColor = () => {
+        if (title === "Luz" && isNight) return "#BBDEFB";
         switch (icon) {
             case "thermometer":
                 return "#FFEBEE";
@@ -238,32 +299,34 @@ function SensorCard({
         }
     };
 
-
     return (
         <View style={GardenDetailStyle.card}>
-
-            {/* Titulo */}
             <Text style={GardenDetailStyle.cardTitle}>{title}</Text>
 
-            {/* icono solo en su linea */}
-            <View style={[GardenDetailStyle.iconContainer, { backgroundColor: getIconBgColor() }]}>
-                <MaterialCommunityIcons
-                    name={icon}
-                    size={26}
-                    color={getIconColor()}
-                />
+            <View
+                style={[
+                    GardenDetailStyle.iconContainer,
+                    { backgroundColor: getIconBgColor() },
+                ]}
+            >
+                {title === "Luz" && isNight ? (
+                    <Ionicons name="moon" size={26} color="#1565C0" />
+                ) : (
+                    <MaterialCommunityIcons name={icon} size={26} color={getIconColor()} />
+                )}
             </View>
 
+            {!(title === "Luz" && isNight) && (
+                <Text style={[GardenDetailStyle.cardValue, { color: valueColor }]}>
+                    {data.valor} {unit}
+                </Text>
+            )}
 
-            {/* Valor */}
-            <Text style={[GardenDetailStyle.cardValue, { color: valueColor }]}>
-                {data.valor} {unit}
-            </Text>
-
-            {/* Rango */}
-            <Text style={GardenDetailStyle.cardRange}>
-                Rango ideal: {data.min} - {data.max} {unit}
-            </Text>
+            {!(title === "Luz" && isNight) && (
+                <Text style={GardenDetailStyle.cardRange}>
+                    Rango ideal: {data.min} - {data.max} {unit}
+                </Text>
+            )}
         </View>
     );
 }
