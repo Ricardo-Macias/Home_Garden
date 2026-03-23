@@ -2,7 +2,6 @@ import React from "react";
 import {
     View,
     Text,
-    StyleSheet,
     FlatList,
     Image,
     Pressable,
@@ -13,6 +12,8 @@ import Constants from "expo-constants";
 import gardenCardStyle from "@/styles/gardenCardStyle";
 
 interface Huerto {
+    _id?: string;
+    id?: string; 
     usuario: number;
     sensor: number;
     huerto: string;
@@ -32,16 +33,21 @@ export default function HomeGardenGrid({ huertos }: Props) {
     const router = useRouter();
 
     const renderItem = ({ item }: { item: Huerto }) => {
+
         const imageUrl = item.imagen
             ? `${API_URL}/uploads/${item.imagen}`
             : "https://via.placeholder.com/150.png?text=Huerto";
 
+        const id = item._id || item.id;
+
         return (
             <Pressable
-                onPress={() =>
+                onPress={() => {
+
                     router.push({
                         pathname: "/home/GardenDetail",
                         params: {
+                            id: id, 
                             sensor: item.sensor,
                             huerto: item.huerto,
                             cultivo: item.cultivo,
@@ -49,8 +55,8 @@ export default function HomeGardenGrid({ huertos }: Props) {
                             inicio: item.inicio,
                             termina: item.termina,
                         },
-                    })
-                }
+                    });
+                }}
                 style={({ pressed }) => [
                     gardenCardStyle.card,
                     {
@@ -65,12 +71,20 @@ export default function HomeGardenGrid({ huertos }: Props) {
                         style={gardenCardStyle.image}
                         resizeMode="cover"
                     />
+
                     <View style={gardenCardStyle.info}>
-                        <Text style={gardenCardStyle.huerto}>{item.huerto}</Text>
-                        <Text style={gardenCardStyle.cultivo}>{item.cultivo}</Text>
+                        <Text style={gardenCardStyle.huerto}>
+                            {item.huerto}
+                        </Text>
+
+                        <Text style={gardenCardStyle.cultivo}>
+                            {item.cultivo}
+                        </Text>
+
                         <Text style={gardenCardStyle.fecha}>
                             Inicio: {formatDate(item.inicio)}
                         </Text>
+
                         <Text style={gardenCardStyle.fecha}>
                             Estimada: {formatDate(item.termina)}
                         </Text>
@@ -83,10 +97,11 @@ export default function HomeGardenGrid({ huertos }: Props) {
     return (
         <FlatList
             data={huertos}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(item, index) =>
+                item._id || item.id || index.toString()
+            }
             renderItem={renderItem}
-            numColumns={1} 
-            key={"one-column"} 
+            numColumns={1}
             contentContainerStyle={gardenCardStyle.list}
             showsVerticalScrollIndicator={false}
         />
