@@ -24,8 +24,8 @@ export default function ViewUserProfile() {
 
         const loadProfile = async () => {
             try {
-                // Perfil básico
-                const response = await fetch(`${config.API_URL}/user/${user.id}`);
+                // Perfil completo con historial 
+                const response = await fetch(`${config.API_URL}/perfil/${user.id}`);
                 const data = await response.json();
                 setProfile(data);
 
@@ -81,7 +81,6 @@ export default function ViewUserProfile() {
                 </TouchableOpacity>
             </View>
 
-            {/* Contenido segun pestaña */}
             {activeTab === "historial" ? (
                 <ComponentsHistory historial={profile.historial ?? []} />
             ) : (
