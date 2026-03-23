@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import Constants from "expo-constants";
 
 interface AppConfig {
-    API_URL: string;
+    SUPABASE_URL: string;
 }
 
 const config = Constants.expoConfig?.extra as AppConfig;
@@ -16,12 +16,12 @@ type Props = {
 
 export default function ImageViewer({ theme, imgSource, sizeWidth, sizeHeight }: Props){
     if (theme === "predetermined"){
-        return <Image source={`${config.API_URL}/uploads/Predeterminada.png`} style={{width: sizeWidth, height: sizeHeight}}/>
+        return <Image source={`${config.SUPABASE_URL}/uploads/Sensores/Predeterminada.png`} style={{width: sizeWidth, height: sizeHeight}}/>
     }
 
     if (theme === "photo"){
         return <Image
-            source={`${config.API_URL}/uploads/${imgSource}`}
+            source={imgSource}
             style={{
                 width: sizeWidth,
                 height: sizeHeight,
