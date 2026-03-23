@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions  } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { colors } from "../styles/colors";
 
 const { width } = Dimensions.get("window");
@@ -74,7 +74,7 @@ const GardenDetailStyle = StyleSheet.create({
         textAlign: "center",
     },
     section: {
-        marginTop: 20,
+        marginTop: 5,
         backgroundColor: "#FFFFFF",
         padding: 15,
         borderRadius: 16,
@@ -126,5 +126,19 @@ const GardenDetailStyle = StyleSheet.create({
         marginRight: 10,
         alignItems: "center",
     },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: "600",
+        color: "#27ae60",
+        marginBottom: 8,
+        textAlign: "center",
+    },
+    rowBetween: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginVertical: 8,
+    },
+
 });
 export default GardenDetailStyle;
