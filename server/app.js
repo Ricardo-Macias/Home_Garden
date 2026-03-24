@@ -1,12 +1,14 @@
 import express from "express";
 import cors from "cors";
-
+import { createClient } from "@supabase/supabase-js";
 
 import perfilRoutes from './routes/profile.js';
 import {
     getAllCrop,
     getGarden,
-    getSensors
+    getHistorialRiego,
+    getSensors,
+    getUltimoRiego
 } from "./database.js";
 
 // Importar controladores
@@ -54,6 +56,7 @@ const app = express();
 app.use(express.json());
 app.use(cors(corsOptions));
 
+/* SERVER LOCAL
 const storage = multer.diskStorage({
     destination: "uploads/",
     filename: (req, file, cb) => {
@@ -61,10 +64,18 @@ const storage = multer.diskStorage({
         cb(null, `${Date.now()}${ext}`);
     },
 })
+*/
+
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage })
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
 
 /**
  * USUARIO
@@ -105,6 +116,43 @@ app.get("/searchIdCrop/:name", searchIdCrop);
     Subir Imagen
 */
 
+app.post("upload", upload.single("file"), async (req, res) => {
+    try {
+        const file = req.file;
+
+        if (!file){
+            return res.status(400).json({error: "No se envio archivo"});
+        }
+
+        const fileName = `Sensores/${Date.now()}-${file.originalname}`;
+
+        const { data, error } = await supabase.storage
+            .from("uploads")
+            .upload(fileName, file.buffer,{
+                contentType: file.mimetype,
+            });
+        
+        if (error){
+            console.error(error);
+            return res.status(500).json({ error: "Error subiendo archivo"});
+        }
+
+        const { data: urlData } = supabase.storage
+            .from("uploads")
+            .getPublicUrl(fileName);
+        
+        res.json({
+            message: "Archivo subido correctamente",
+            url: urlData.publicUrl,
+        });
+    } catch (error) {
+        console.error(err);
+        res.status(500).json({ error: "Error del servidor "});
+
+    }
+});
+
+/*
 app.use("/uploads", express.static("uploads"));
 
 app.post("/upload", upload.single("image"), (req, res) => {
@@ -113,6 +161,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
         filename: req.file.filename
     });
 });
+*/
 
 /*
     Datos de los sensores
@@ -141,4 +190,30 @@ app.use("/favoritos", favoritos);
 
 app.listen(8080, () => {
     console.log("Server running on port 8080");
+});
+
+/*
+ * HISTORIAL DE REGADO 
+*/
+
+app.get("/getHistorialRiego/:idHuerto", async (req, res) => {
+    const { idHuerto } = req.params;
+    try {
+        const historial = await getHistorialRiego(idHuerto);
+        res.json(historial);
+    } catch(error){
+        console.log("Error al obtener historial de riego: ", error.message);
+        res.status(500).json({error: "Error al obtener historial de riego"});
+    }
+})
+
+app.get("/getUltimoRiego/:idHuerto", async (req, res) => {
+    const { idHuerto } = req.params;
+    try {
+        const ultimo = await getUltimoRiego(idHuerto);
+        res.json(ultimo);
+    } catch (error){
+        console.log("Error al obtener ultimo riego: ", error.message);
+        res.status(500).json({error: "Error al obtener ultimo riego"});
+    }
 });
