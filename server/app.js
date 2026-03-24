@@ -56,16 +56,6 @@ const app = express();
 app.use(express.json());
 app.use(cors(corsOptions));
 
-/* SERVER LOCAL
-const storage = multer.diskStorage({
-    destination: "uploads/",
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname) || ".jpg";
-        cb(null, `${Date.now()}${ext}`);
-    },
-})
-*/
-
 const storage = multer.memoryStorage();
 
 const upload = multer({ storage })
@@ -153,17 +143,6 @@ app.post("upload", upload.single("file"), async (req, res) => {
 });
 
 /*
-app.use("/uploads", express.static("uploads"));
-
-app.post("/upload", upload.single("image"), (req, res) => {
-    res.json({
-        message: "Imagen subida correctamente",
-        filename: req.file.filename
-    });
-});
-*/
-
-/*
     Datos de los sensores
 */
 
@@ -186,11 +165,6 @@ app.post("/should-water", mandani);
 */
 
 app.use("/favoritos", favoritos);
-
-
-app.listen(8080, () => {
-    console.log("Server running on port 8080");
-});
 
 /*
  * HISTORIAL DE REGADO 
@@ -216,4 +190,10 @@ app.get("/getUltimoRiego/:idHuerto", async (req, res) => {
         console.log("Error al obtener ultimo riego: ", error.message);
         res.status(500).json({error: "Error al obtener ultimo riego"});
     }
+});
+
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
