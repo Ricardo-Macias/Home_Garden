@@ -70,3 +70,12 @@ CREATE TABLE IF NOT EXISTS favoritos (
     FOREIGN KEY(usuario_id) REFERENCES usuario(id),
     FOREIGN KEY(cultivo_id) REFERENCES cultivo(id)
 );
+
+CREATE TABLE IF NOT EXISTS historial_regado (
+    idRiego INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idHuerto INT NOT NULL,
+    fecha DATE DEFAULT(CURDATE()),
+    hora TIME DEFAULT(CURTIME()),
+    duracion INT,
+    FOREIGN KEY(idHuerto) REFERENCES huerto(idHuerto)
+);

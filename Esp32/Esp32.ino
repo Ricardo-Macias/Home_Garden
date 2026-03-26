@@ -92,7 +92,6 @@ void saveConfig(){
   receivedPassword = prefs.getString("password", "");
 
   if (deviceName == ""){
-    //Primera vez encendido
     deviceName = getDeviceName();
     prefs.putString("name", deviceName);
   }else{
@@ -204,7 +203,8 @@ float fuzzy(int hum, float temp, float lux, float humAmb){
     http.begin(FreshApiUrl);
     http.addHeader("Content-Type", "application/json");
 
-    String json = "{\"soilMoisture\":" + String(hum) + ","
+    String json = "{\"deviceName\":\"" + deviceName + "\","
+              "\"soilMoisture\":" + String(hum) + ","
               "\"temperature\":" + String(temp) + ","
               "\"humidity\":" + String(humAmb) + ","
               "\"light\":" + String(lux) + "}";
