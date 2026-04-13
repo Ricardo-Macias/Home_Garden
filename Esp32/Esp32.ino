@@ -204,7 +204,8 @@ float fuzzy(int hum, float temp, float lux, float humAmb){
     http.begin(FreshApiUrl);
     http.addHeader("Content-Type", "application/json");
 
-    String json = "{\"soilMoisture\":" + String(hum) + ","
+    String json = "{\"nombre\":\"" + deviceName + "\",";
+              "\"soilMoisture\":" + String(hum) + ","
               "\"temperature\":" + String(temp) + ","
               "\"humidity\":" + String(humAmb) + ","
               "\"light\":" + String(lux) + "}";
