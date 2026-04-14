@@ -1,4 +1,4 @@
-SET GLOBAL event_scheduler = ON;
+/*SET GLOBAL event_scheduler = ON;
 
 USE home_garden;
 
@@ -10,3 +10,4 @@ DO
     WHERE "fechaEstimada" IS NOT NULL
     AND "fechaEstimada" <= CURRENT_DATE
     AND estado = 0;
+*/

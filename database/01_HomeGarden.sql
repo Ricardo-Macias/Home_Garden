@@ -1,8 +1,4 @@
-CREATE DATABASE IF NOT EXISTS home_garden;
-
-USE home_garden;
-
-CREATE TABLE IF NOT EXISTS usuario (
+CREATE TABLE usuario (
 	id SERIAL PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL,
     apellidos VARCHAR(180) NOT NULL,
@@ -11,7 +7,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     imagen VARCHAR(180)
 );
 
-CREATE TABLE IF NOT EXISTS cultivo (
+CREATE TABLE cultivo (
 	id SERIAL PRIMARY KEY,
     nombre VARCHAR(180) NOT NULL,
     tipo VARCHAR(80) NOT NULL,
@@ -29,14 +25,14 @@ CREATE TABLE IF NOT EXISTS cultivo (
     luz_max FLOAT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS sensor (
+CREATE TABLE sensor (
     "idSensor" SERIAL PRIMARY KEY,
     "idUsuario" INT NOT NULL,
     "deviceName" VARCHAR(20) NOT NULL,
     FOREIGN KEY("idUsuario") REFERENCES usuario(id)
 );
 
-CREATE TABLE IF NOT EXISTS huerto (
+CREATE TABLE huerto (
     "idHuerto" SERIAL PRIMARY KEY,
     "idSensor" INT NOT NULL,
     "idCultivo" INT NOT NULL,
@@ -50,7 +46,7 @@ CREATE TABLE IF NOT EXISTS huerto (
     FOREIGN KEY("idCultivo") REFERENCES cultivo(id)
 );
 
-CREATE TABLE IF NOT EXISTS sensor_data (
+CREATE TABLE sensor_data (
     "idSensorData" SERIAL PRIMARY KEY,
     "idSensor" INT NOT NULL,
     temperatura FLOAT NOT NULL,
@@ -62,7 +58,7 @@ CREATE TABLE IF NOT EXISTS sensor_data (
     FOREIGN KEY("idSensor") REFERENCES sensor("idSensor")
 );
 
-CREATE TABLE IF NOT EXISTS favoritos (
+CREATE TABLE favoritos (
     id SERIAL PRIMARY KEY,
     usuario_id INT NOT NULL,
     cultivo_id INT NOT NULL,

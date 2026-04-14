@@ -11,7 +11,7 @@ CREATE VIEW vw_home AS SELECT
     JOIN cultivo c ON h."idCultivo" = c.id
     JOIN sensor s ON h."idSensor" = s."idSensor"
     JOIN usuario u ON u.id = s."idUsuario"
-    WHERE h.estado = 0;
+    WHERE h.estado = FALSE;
 
 CREATE VIEW vista_historial_huertos AS SELECT
         u.id AS "idUsuario",
@@ -28,4 +28,4 @@ CREATE VIEW vista_historial_huertos AS SELECT
     JOIN sensor s ON h."idSensor" = s."idSensor"
     JOIN usuario u ON s."idUsuario" = u.id
     JOIN cultivo c ON h."idCultivo" = c.id
-    WHERE h.estado = 1;
+    WHERE h.estado = TRUE;
