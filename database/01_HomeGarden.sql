@@ -66,3 +66,12 @@ CREATE TABLE favoritos (
     FOREIGN KEY(usuario_id) REFERENCES usuario(id),
     FOREIGN KEY(cultivo_id) REFERENCES cultivo(id)
 );
+
+CREATE TABLE historial_regado (
+    "idRiego" SERIAL PRIMARY KEY
+    "idHuerto" INT NOT NULL,
+    fecha DATE DEFAULT(CURRENT_DATE),
+    hora TIME DEFAULT(CURRENT_TIME),
+    durecion INT,
+    FOREIGN KEY("idHuerto") REFERENCES huerto("idHuerto")
+);
