@@ -3,7 +3,7 @@ import Constants from "expo-constants";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
 interface AppConfig {
-    API_URL: string;
+    SUPABASE_URL: string;
 }
 
 const config = Constants.expoConfig?.extra as AppConfig;
@@ -29,7 +29,7 @@ export default function CropCard({ item, onPress, isFavorite, onToggleFavorite }
         <TouchableOpacity onPress={onPress} style={styles.card}>
             {/* Imagen */}
             <Image
-                source={{ uri: `${config.API_URL}/images/${item.imagen}` }}
+                source={{ uri: `${config.SUPABASE_URL}/uploads/images/${item.imagen}` }}
                 style={styles.image}
                 resizeMode="cover"
             />

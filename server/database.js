@@ -186,7 +186,7 @@ export async function getAllGarden(idUsuario) {
 
 export async function getGarden(idSensor) {
     const row = await pool.query(
-        `SELECT * FROM huerto WHERE "idSensor" = $1`,
+        `SELECT * FROM huerto WHERE "idSensor" = $1`, 
         [idSensor]
     );
     return row.rows[0];
@@ -202,6 +202,16 @@ export async function insertGarden(idSensor, idCultivo, nombre, fechaInicio, fec
     return result;
 }
 
+export async function searchForGardenByIdSensor(name) {
+    const result = await pool.query(
+        `SELECT * FROM huerto WHERE "idSensor" = $1`,
+        [name]
+    );
+
+    return result.rows[0].idHuerto;
+}
+
+/* Eliminar
 export async function deleteGarden(id) {
     const result = await pool.query(
         `DELETE FROM huerto WHERE id = $1`,
@@ -217,6 +227,7 @@ export async function updateGarden(id, idCrop) {
     );
     return result
 }
+*/
 
 /*
  *  Consultas en la tabla cultivo
@@ -368,6 +379,15 @@ export async function isFavorite(usuarioId, cultivoId) {
 /*
  * Consulta en la tabla historial_regado 
 */
+
+export async function insertHistorialRiego(idHuerto, duaration) {
+    const result = await pool.query(
+        `INSERT INTO historial_regado ("idHuerto", duracion) VALUES ($1, $2)`,
+        [idHuerto, duaration]
+    );
+
+    return result;
+}
 
 export async function getHistorialRiego(idHuerto){
     const rows = await pool.query(

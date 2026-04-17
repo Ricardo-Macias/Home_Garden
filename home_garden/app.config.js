@@ -72,7 +72,8 @@ export default {
                 projectId: "f31cf39a-3b1c-4aef-b42f-cad8cea11283"
             },
             API_URL: process.env.API_URL,
-            WEATHER_API_KEY: process.env.WEATHER_API_KEY, //
+            WEATHER_API_KEY: process.env.WEATHER_API_KEY,
+            SUPABASE_URL: process.env.SUPABASE_URL,
         },
         owner: "appmodular"
     }

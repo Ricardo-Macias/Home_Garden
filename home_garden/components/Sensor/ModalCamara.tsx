@@ -41,7 +41,7 @@ export default function ModalCamara({ setImage, isVisible, onClose}: Props){
     const saveImage = async () => {
         const formData = new FormData();
 
-        formData.append("image", {
+        formData.append("file", {
             uri: url,
             name: "photo.jpg",
             type: "image/jpeg",
@@ -52,10 +52,13 @@ export default function ModalCamara({ setImage, isVisible, onClose}: Props){
                 const response = await fetch(`${config.API_URL}/upload`,{
                     method: "POST",
                     body: formData,
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
                 });
                 
                 const data = await response.json();
-                setImage(data.filename); //`${config.API_URL}/uploads/${data.filename}`
+                setImage(data.url); //`${config.API_URL}/uploads/${data.filename}`
                 setUrl(null);
                 onClose();
             } catch(err){

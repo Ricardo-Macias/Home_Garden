@@ -92,7 +92,6 @@ void saveConfig(){
   receivedPassword = prefs.getString("password", "");
 
   if (deviceName == ""){
-    //Primera vez encendido
     deviceName = getDeviceName();
     prefs.putString("name", deviceName);
   }else{
