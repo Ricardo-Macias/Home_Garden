@@ -11,13 +11,11 @@ type Props = {
 };
 
 export default function ImageViewer({ theme, imgSource, sizeWidth, sizeHeight }: Props) {
-    console.log(imgSource);
     if (theme === "predetermined" || imgSource == "Predeterminada.png") {
         return <Image source={`${SUPABASE_URL}/uploads/Sensores/Predeterminada.png`} style={{width: sizeWidth, height: sizeHeight}}/>
     }
 
     if (theme === "photo") {
-        console.log(imgSource);
         return <Image
             source={imgSource}
             style={{
