@@ -41,7 +41,7 @@ export default function Button({ color, label, icon, theme, onPress}: Props){
         return (
             <View
                 style = {[
-                    styles.second, {borderWidth: 1, borderColor: "#6a1b9a", borderRadius: 5, backgroundColor: "#27ae60",}]}
+                    styles.second, {borderWidth: 1, borderColor: "#6a1b9a", borderRadius: 5,}]}
             >
                 <Pressable
                     style={styles.secondBotton}
@@ -49,6 +49,8 @@ export default function Button({ color, label, icon, theme, onPress}: Props){
                 >
                     <FontAwesome 
                     name={icon}
+                    size={18}
+                    color={"#27ae60"}
                     />
                 </Pressable>
 
