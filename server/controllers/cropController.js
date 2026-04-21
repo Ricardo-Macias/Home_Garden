@@ -3,7 +3,9 @@ import {
     insertSensor,
     getAllGarden,
     getIdCrop,
-    getDurationCrop
+    getDurationCrop,
+    lastValueRecordedGarden,
+    gardenCompleted
 } from "../database.js";
 
 // Buscar id del cultivo
@@ -70,9 +72,15 @@ export async function addHomeVegetableGarden(req, res){
         fechaInicio,
         fechaEstimada, 
         estado, 
-        imagen } = req.body;
+        imagen,
+        edit } = req.body;
 
         try {
+            if (edit == 1) {
+                const idGarden = await lastValueRecordedGarden(idSensor);
+                await gardenCompleted(idGarden);
+            }
+
             const result = await insertGarden(idSensor,
                 idCultivo,
                 nombre,
