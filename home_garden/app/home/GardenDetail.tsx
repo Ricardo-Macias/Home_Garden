@@ -110,7 +110,8 @@ export default function GardenDetail() {
 
     const edit = async () => {
         router.push({
-            pathname: "/sensor/EditSensor"
+            pathname: "/sensor/AddSensor",
+            params: {sensor: sensor,bandEdit: 1},
         });
     }
 

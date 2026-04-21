@@ -187,7 +187,7 @@ export default function Home() {
 
                 router.push({
                     pathname: "/sensor/AddSensor",
-                    params: { sensor: data.idSensor },
+                    params: { sensor: data.idSensor, bandEdit: 0 },
                 });
             };
 

@@ -25,7 +25,7 @@ const PlaceholderImage = require("../../assets/images/Predeterminada.png");
 export default function FormSensor(){
     const [name, setName] = useState("");
     const [image, setImage] = useState<string | null>("Predeterminada.png"); 
-    const {sensor} = useLocalSearchParams();
+    const {sensor, bandEdit} = useLocalSearchParams();
     const router = useRouter();
     const navigation = useNavigation();
     const [message, setMessage] = useState<{
@@ -118,6 +118,7 @@ export default function FormSensor(){
                     fechaEstimada: cropDuration,
                     estado: 0,
                     imagen: image,
+                    edit: bandEdit
                 }),
             });
 
