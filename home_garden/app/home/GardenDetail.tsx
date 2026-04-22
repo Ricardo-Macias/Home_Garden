@@ -164,8 +164,9 @@ export default function GardenDetail() {
                     {/* Nombre cultivo */}
                     <Text style={GardenDetailStyle.cultivo}>{cultivo}</Text>
                     
+                    {/* Mensaje de para cambiar de cultivo */}
                     <View>
-                    { currentDate < estimatedDate ? (
+                    { currentDate > estimatedDate ? (
                         <View>
                                 <MessageBox
                                     type="info"
