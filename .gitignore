@@ -58,3 +58,5 @@ api.h
 #Control Difuso
 __pycache__
 venv
+
+uploads
