@@ -8,6 +8,7 @@ import { formatDate, formatTime } from "@/components/utils/formatDate";
 import GardenDetailStyle from "../../styles/GardenDetailStyle";
 import axios from "axios";
 import { usePolling } from "@/hooks/usePolling";
+import { notifyMetrics } from "../../utils/notificationMetrics";
 
 interface AppConfig {
     API_URL: string;
@@ -78,6 +79,7 @@ export default function GardenDetail() {
                 );
 
                 setSensorData(rangesData);
+                notifyMetrics(rangesData);
             } catch (err) {
                 console.error("Error al validar rangos:", err);
             }
