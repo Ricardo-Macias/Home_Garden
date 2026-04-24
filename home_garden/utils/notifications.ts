@@ -23,8 +23,15 @@ Notifications.setNotificationHandler({
 
 let lastWeatherCode: number | null = null;
 
+const isAllowedTime = (): boolean => {
+    const hour = new Date().getHours();
+    return hour >= 6 && hour < 24;
+};
+
 export const checkWeatherChange = async () => {
     try {
+        if (!isAllowedTime()) return;
+
         const response = await axios.get(
             `https://api.openweathermap.org/data/2.5/weather?lat=20.7167&lon=-103.4&units=metric&appid=${config.WEATHER_API_KEY}&lang=es`
         );
@@ -35,16 +42,16 @@ export const checkWeatherChange = async () => {
 
         if (lastWeatherCode !== null && lastWeatherCode !== newCode) {
             let message = "";
-            let title = "Cambio de clima";
+            let title = "Cambio brusco de clima";
 
             if (newCode >= 200 && newCode < 600) {
-                message = "Esta nublado.";
+                message = "Se detecta lluvia repentina, toma precauciones.";
                 title = "Clima lluvioso";
             } else if (newCode === 800) {
-                message = "Esta soleado.";
+                message = "Cambio repentino: ahora esta soleado.";
                 title = "Clima soleado";
             } else {
-                message = `El clima cambio: ${desc}`;
+                message = `El clima cambio bruscamente: ${desc}`;
             }
 
             await Notifications.scheduleNotificationAsync({
@@ -80,14 +87,27 @@ export const scheduleDailyWeatherNotifications = async () => {
         const data = response.data;
         const weatherCode = data.weather?.[0]?.id ?? null;
         const desc = data.weather?.[0]?.description ?? "";
+        const temp = data.main?.temp ?? null;
 
-        let message = "";
+        let messages: string[] = [];
         if (weatherCode >= 200 && weatherCode < 600) {
-            message = "Hoy llovera, lleva paraguas.";
+            messages = [
+                "Hoy se esperan lluvias, lleva paraguas.",
+                "Probabilidad de lluvia, cuida tus plantas.",
+                "El dia estará lluvioso, toma precauciones."
+            ];
         } else if (weatherCode === 800) {
-            message = "Dia soleado, perfecto para tus plantas.";
+            messages = [
+                "Dia soleado, ideal para tus cultivos.",
+                "El sol estara presente todo el dia.",
+                "Clima despejado, aprovecha la luz solar."
+            ];
         } else {
-            message = `El clima sera: ${desc}`;
+            messages = [
+                `El clima sera: ${desc}`,
+                `Pronóstico: ${desc}, ajusta tus cuidados.`,
+                `Condiciones previstas: ${desc}`
+            ];
         }
 
         await Notifications.cancelAllScheduledNotificationsAsync();
@@ -95,7 +115,8 @@ export const scheduleDailyWeatherNotifications = async () => {
         const times = [
             { hour: 7, minute: 0 },
             { hour: 13, minute: 0 },
-            { hour: 20, minute: 0 },
+            { hour: 16, minute: 0 },
+            { hour: 18, minute: 0 },
         ];
 
         for (const { hour, minute } of times) {
@@ -106,8 +127,20 @@ export const scheduleDailyWeatherNotifications = async () => {
                 type: SchedulableTriggerInputTypes.TIME_INTERVAL,
             };
 
+            let bodyMessage = "";
+
+            if (hour === 18) {
+                if (temp && temp < 15) {
+                    bodyMessage = "Se espera una noche fria, protege tus cultivos.";
+                } else {
+                    bodyMessage = "Revisa tus cultivos, la temperatura bajara en la noche.";
+                }
+            } else {
+                bodyMessage = messages[Math.floor(Math.random() * messages.length)];
+            }
+
             await Notifications.scheduleNotificationAsync({
-                content: { title: "Clima", body: message },
+                content: { title: "Clima diario", body: bodyMessage },
                 trigger,
             });
         }
