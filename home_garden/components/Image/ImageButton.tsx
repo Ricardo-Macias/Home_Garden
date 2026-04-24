@@ -10,7 +10,7 @@ type Props = {
     color: string;
     label: string;
     icon: FontAwesomeIconName;
-    theme?: "primary" | "camera";
+    theme?: "primary" | "camera" | "second";
     onPress: () => void;
 };
 
@@ -36,6 +36,27 @@ export default function Button({ color, label, icon, theme, onPress}: Props){
             </View>
         );
     };
+
+    if (theme === "second"){
+        return (
+            <View
+                style = {[
+                    styles.second, {borderWidth: 1, borderColor: "#6a1b9a", borderRadius: 5,}]}
+            >
+                <Pressable
+                    style={styles.secondBotton}
+                    onPress={onPress}
+                >
+                    <FontAwesome 
+                    name={icon}
+                    size={18}
+                    color={"#27ae60"}
+                    />
+                </Pressable>
+
+            </View>
+        )
+    }
 
     if (theme === "camera") {
         return (
@@ -80,5 +101,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#f1f1f1",
         marginLeft: 10,
+    },
+    second: {
+        position: "absolute",
+        bottom: 10,
+        right: 20,
+        width: "15%",
+        height: "30%",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+    },
+    secondBotton: {
+        width: "100%",
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
     },
 })

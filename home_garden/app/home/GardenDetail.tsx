@@ -1,13 +1,15 @@
-import { View, Text, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 import Constants from "expo-constants";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { formatDate, formatTime } from "@/components/utils/formatDate";
 import GardenDetailStyle from "../../styles/GardenDetailStyle";
 import axios from "axios";
 import { usePolling } from "@/hooks/usePolling";
+import MessageBox from "@/components/MessageBox";
+import Button from "@/components/Image/ImageButton"
 import { notifyMetrics } from "../../utils/notificationMetrics";
 
 interface AppConfig {
@@ -45,6 +47,8 @@ export default function GardenDetail() {
     const imageUrl = String(params.imagen ?? "https://via.placeholder.com/400");
     const inicio = String(params.inicio ?? "");
     const termina = String(params.termina ?? "");
+    const currentDate = new Date();
+    const estimatedDate = new Date(termina);
 
     const horasRiego = ["09:00 AM", "04:00 PM"];
 
@@ -106,6 +110,13 @@ export default function GardenDetail() {
         fetchUltimoRiego();
     }, [id]);
 
+    const edit = async () => {
+        router.push({
+            pathname: "/sensor/AddSensor",
+            params: {sensor: sensor,bandEdit: 1},
+        });
+    }
+
     return (
         <>
             <Stack.Screen
@@ -151,10 +162,31 @@ export default function GardenDetail() {
                             ))}
                         </ScrollView>
                     </View>
-
+                    
                     {/* Nombre cultivo */}
                     <Text style={GardenDetailStyle.cultivo}>{cultivo}</Text>
-
+                    
+                    {/* Mensaje de para cambiar de cultivo */}
+                    <View>
+                    { currentDate > estimatedDate ? (
+                        <View>
+                                <MessageBox
+                                    type="info"
+                                    message="La fecha estimada a sido superada, ¿Desea cambiar el cultivo?"
+                                />
+                                <Button
+                                    color=""
+                                    label=""
+                                    icon="check"
+                                    theme="second"
+                                    onPress={edit}
+                                />
+                        </View>
+                        
+                            ):(
+                                <Text></Text>
+                            )}
+                    </View>
                     {/* Fechas */}
                     <View style={GardenDetailStyle.section}>
                         <View style={GardenDetailStyle.row}>
@@ -233,7 +265,7 @@ export default function GardenDetail() {
                                     color="#27ae60"
                                     onPress={() =>
                                         router.push({
-                                            pathname: "/home/HistorialRiego",
+                                            pathname: "./home/HistorialRiego",
                                             params: { id },
                                         })
                                     }

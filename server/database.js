@@ -99,7 +99,7 @@ export async function getUserProfile(idUsuario) {
         nombre: userRows.rows[0].nombre,
         apellidos: userRows.rows[0].apellidos,
         correo: userRows.rows[0].correo,
-        historial: historialRows.rows[0]
+        historial: historialRows.rows
     };
 }
 
@@ -211,23 +211,21 @@ export async function searchForGardenByIdSensor(name) {
     return result.rows[0].idHuerto;
 }
 
-/* Eliminar
-export async function deleteGarden(id) {
+export async function gardenCompleted(idHuerto){
     const result = await pool.query(
-        `DELETE FROM huerto WHERE id = $1`,
-        [id]
+        `UPDATE huerto SET "fechaFin" = CURRENT_DATE, estado = TRUE WHERE "idHuerto" = $1`,
+        [idHuerto]
     );
-    return result;
 }
 
-export async function updateGarden(id, idCrop) {
+export async function lastValueRecordedGarden(id){
     const result = await pool.query(
-        `UPDATE huerto SET "idCrop" = $1 WHERE id = $2`,
-        [idCrop, id]
+        `SELECT * FROM huerto WHERE "idSensor" = $1 ORDER BY "idHuerto" DESC LIMIT 1`,
+        [id]
     );
-    return result
+
+    return result.rows[0].idHuerto;
 }
-*/
 
 /*
  *  Consultas en la tabla cultivo
