@@ -44,6 +44,7 @@ import {
 import cultivoRoutes from "./routes/cultivo.js";
 
 import favoritos from "./routes/favoritos.js";
+import { perfil } from "./controllers/profileController.js";
 
 const corsOptions = {
     origin: "http://127.0.0.1:5173",
@@ -74,6 +75,7 @@ app.post("/login", login);
 app.post("/register", register);
 app.post("/refresh", refreshToken);
 
+app.get("perfil/:id", perfil);
 app.get("/user/:id", getUser);
 app.delete("/user/:id", removeUser);
 

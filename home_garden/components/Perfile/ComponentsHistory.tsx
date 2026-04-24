@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { formatDate } from "@/components/utils/formatDate";
 
-const API_URL = Constants.expoConfig?.extra?.API_URL;
+const SUPABASE_URL = Constants.expoConfig?.extra?.SUPABASE_URL;
 
 interface HistorialItem {
     idHuerto: number;
@@ -41,8 +41,9 @@ export default function ComponentsHistory({ historial }: Props) {
     const closeModal = () => setSelectedItem(null);
 
     const renderItem = ({ item }: { item: HistorialItem }) => {
+        console.log(item.imagen);
         const imageUrl = item.imagen
-            ? `${API_URL}/uploads/${item.imagen}`
+            ? `${SUPABASE_URL}/uploads/Sensores/${item.imagen}`
             : "https://via.placeholder.com/100x100.png?text=Huerto";
 
         return (
@@ -61,6 +62,9 @@ export default function ComponentsHistory({ historial }: Props) {
             </TouchableOpacity>
         );
     };
+
+    useEffect(() => {
+    })
 
     return (
         <View style={styles.container}>
@@ -99,7 +103,7 @@ export default function ComponentsHistory({ historial }: Props) {
                                     <Image
                                         source={{
                                             uri: selectedItem.imagen
-                                                ? `${API_URL}/uploads/${selectedItem.imagen}`
+                                                ? `${SUPABASE_URL}/uploads/Sensores/${selectedItem.imagen}`
                                                 : "https://via.placeholder.com/200x150.png?text=Huerto",
                                         }}
                                         style={styles.modalImage}
