@@ -10,6 +10,7 @@ import axios from "axios";
 import { usePolling } from "@/hooks/usePolling";
 import MessageBox from "@/components/MessageBox";
 import Button from "@/components/Image/ImageButton"
+import { notifyMetrics } from "../../utils/notificationMetrics";
 
 interface AppConfig {
     API_URL: string;
@@ -82,6 +83,7 @@ export default function GardenDetail() {
                 );
 
                 setSensorData(rangesData);
+                notifyMetrics(rangesData);
             } catch (err) {
                 console.error("Error al validar rangos:", err);
             }

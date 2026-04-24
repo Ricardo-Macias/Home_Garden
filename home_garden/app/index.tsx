@@ -17,6 +17,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 global.Buffer = global.Buffer || require('buffer').Buffer;
 import PlantLoader from "../components/Loader";
 
+import {
+    checkWeatherChange,
+    scheduleDailyWeatherNotifications,
+} from "../utils/notifications";
+
 export default function Index() {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
@@ -27,8 +32,6 @@ export default function Index() {
     );
 
     const [showSignup, setShowSignup] = useState(false);
-
-    // Estado nuevo: evita mostrar login antes de saber si hay token
     const [checkingSession, setCheckingSession] = useState(true);
 
     const [loginMessage, setLoginMessage] = useState<string | null>(null);
@@ -44,22 +47,39 @@ export default function Index() {
             } catch (err) {
                 console.log("Error leyendo token:", err);
             }
-
-            // Termino de revision del token
             setCheckingSession(false);
         };
 
         checkToken();
     }, []);
 
-    // Si ya hay usuario y token entra directamente a home
     useEffect(() => {
         if (!checkingSession && navigationState && accessToken && user) {
             router.replace("/(tabs)/home");
         }
     }, [checkingSession, navigationState, accessToken, user]);
 
-    // Loader
+    useEffect(() => {
+        checkWeatherChange();
+        scheduleDailyWeatherNotifications();
+
+        const interval = setInterval(() => {
+            checkWeatherChange();
+        }, 60 * 60 * 1000);
+
+        const morningInterval = setInterval(() => {
+            const now = new Date();
+            if (now.getHours() === 6 && now.getMinutes() === 0) {
+                scheduleDailyWeatherNotifications();
+            }
+        }, 60 * 1000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(morningInterval);
+        };
+    }, []);
+
     if (checkingSession) {
         return (
             <SafeAreaProvider style={{ flex: 1 }}>
