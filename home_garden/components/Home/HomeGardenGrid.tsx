@@ -27,7 +27,7 @@ interface Props {
     huertos: Huerto[];
 }
 
-const API_URL = Constants.expoConfig?.extra?.API_URL;
+const SUPABASE_URL = Constants.expoConfig?.extra?.SUPABASE_URL;
 
 export default function HomeGardenGrid({ huertos }: Props) {
     const router = useRouter();
@@ -35,7 +35,7 @@ export default function HomeGardenGrid({ huertos }: Props) {
     const renderItem = ({ item }: { item: Huerto }) => {
 
         const imageUrl = item.imagen
-            ? `${API_URL}/uploads/${item.imagen}`
+            ? `${SUPABASE_URL}/uploads/Sensores/Predeterminada.png`
             : "https://via.placeholder.com/150.png?text=Huerto";
 
         const id = item._id || item.id;

@@ -1,11 +1,7 @@
 import { Image } from "expo-image";
 import Constants from "expo-constants";
 
-interface AppConfig {
-    SUPABASE_URL: string;
-}
-
-const config = Constants.expoConfig?.extra as AppConfig;
+const SUPABASE_URL = Constants.expoConfig?.extra?.SUPABASE_URL;
 
 type Props = {
     theme: "predetermined" | "photo";
@@ -14,12 +10,14 @@ type Props = {
     sizeHeight: number;
 };
 
-export default function ImageViewer({ theme, imgSource, sizeWidth, sizeHeight }: Props){
-    if (theme === "predetermined"){
-        return <Image source={`${config.SUPABASE_URL}/uploads/Sensores/Predeterminada.png`} style={{width: sizeWidth, height: sizeHeight}}/>
+export default function ImageViewer({ theme, imgSource, sizeWidth, sizeHeight }: Props) {
+    console.log(imgSource);
+    if (theme === "predetermined" || imgSource == "Predeterminada.png") {
+        return <Image source={`${SUPABASE_URL}/uploads/Sensores/Predeterminada.png`} style={{width: sizeWidth, height: sizeHeight}}/>
     }
 
-    if (theme === "photo"){
+    if (theme === "photo") {
+        console.log(imgSource);
         return <Image
             source={imgSource}
             style={{

@@ -3,7 +3,9 @@ import axios from 'axios';
 import {
     searchForSensorByName,
     lastValueRecordedSensorData,
-    insertSensorData
+    insertSensorData,
+    searchForGardenByIdSensor,
+    insertHistorialRiego
 } from "../database.js";
 
 dotenv.config();
@@ -48,6 +50,7 @@ export async function getSensorData(req, res){
 
 export async function mandani(req, res){
     const {
+        deviceName,
         soilMoisture,
         temperature,
         humidity,
@@ -60,6 +63,10 @@ export async function mandani(req, res){
             humidity: humidity,
             light: light
         });
+
+        const idSensor = await searchForSensorByName(deviceName);
+        const idGarden = await searchForGardenByIdSensor(idSensor);
+        const result = await insertHistorialRiego(idGarden, Math.trunc(response.data.seconds));
 
         res.json(response.data);
     } catch(error){
