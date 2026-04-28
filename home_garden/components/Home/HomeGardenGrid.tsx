@@ -38,7 +38,7 @@ export default function HomeGardenGrid({ huertos }: Props) {
             ? `${SUPABASE_URL}/uploads/Sensores/Predeterminada.png`
             : "https://via.placeholder.com/150.png?text=Huerto";
 
-        const id = item._id || item.id;
+        const id = item._id || item.usuario;
 
         return (
             <Pressable

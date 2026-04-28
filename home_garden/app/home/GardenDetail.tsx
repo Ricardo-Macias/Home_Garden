@@ -39,7 +39,7 @@ export default function GardenDetail() {
     const [sensorData, setSensorData] = useState<SensorData | null>(null);
     const [ultimoRiego, setUltimoRiego] = useState<any | null>(null);
 
-    const id = String(params.id ?? "");
+    const id = Number(params.id ?? "");
 
     const sensor = Number(params.sensor ?? "");
     const huerto = String(params.huerto ?? "");
@@ -97,13 +97,17 @@ export default function GardenDetail() {
             if (!id) return;
 
             try {
-                const response = await axios.get(
-                    `${config.API_URL}/getUltimoRiego/${id}`
+                const response = await axios.post(
+                    `${config.API_URL}/getUltimoRiego`,
+                    {
+                        idSensor: sensor,
+                        huerto: huerto,
+                    }
                 );
 
                 setUltimoRiego(response.data);
             } catch (error) {
-                console.error("Error al cargar ultimo riego:", error);
+                console.log("Error al cargar ultimo riego:", error);
             }
         };
 
@@ -266,7 +270,7 @@ export default function GardenDetail() {
                                     onPress={() =>
                                         router.push({
                                             pathname: "./home/HistorialRiego",
-                                            params: { id },
+                                            params: { id:3 },
                                         })
                                     }
                                 />

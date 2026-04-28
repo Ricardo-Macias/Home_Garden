@@ -8,7 +8,8 @@ import {
     getGarden,
     getHistorialRiego,
     getSensors,
-    getUltimoRiego
+    getUltimoRiego,
+    SearchForGardenIDByNameAndSensorID
 } from "./database.js";
 
 // Importar controladores
@@ -184,8 +185,12 @@ app.get("/getHistorialRiego/:idHuerto", async (req, res) => {
 })
 
 app.get("/getUltimoRiego/:idHuerto", async (req, res) => {
-    const { idHuerto } = req.params;
+    const { 
+        idSensor,
+        huerto
+     } = req.body;
     try {
+        const idHuerto = await SearchForGardenIDByNameAndSensorID(huerto, idSensor);
         const ultimo = await getUltimoRiego(idHuerto);
         res.json(ultimo);
     } catch (error){
