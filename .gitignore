@@ -48,3 +48,15 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Image
+uploads/*.jpg
+
+#esp32
+api.h
+
+#Control Difuso
+__pycache__
+venv
+
+uploads

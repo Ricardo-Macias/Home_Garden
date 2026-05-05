@@ -1,39 +1,144 @@
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from "react-native";
 import Constants from "expo-constants";
+import LoginForm from "../components/LoginForm";
+import CreateUserForm from "../components/CreateUserForm";
+import { useRouter, useRootNavigationState } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import * as SecureStore from "expo-secure-store";
+import {
+    loginUser,
+    refreshToken,
+    registerUser,
+    clearError,
+} from "../Redux/authSlice";
+import { RootState, AppDispatch } from "../Redux/store";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+global.Buffer = global.Buffer || require('buffer').Buffer;
+import PlantLoader from "../components/Loader";
 
-interface AppConfig {
-  API_URL: string;
-}
-
-const config = Constants.expoConfig?.extra as AppConfig;
+import {
+    checkWeatherChange,
+    scheduleDailyWeatherNotifications,
+} from "../utils/notifications";
 
 export default function Index() {
-  const [users, setUser] = useState([]);
+    const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+    const navigationState = useRootNavigationState();
 
-  useEffect(() => {
-      fetchData();
-    },[])
+    const { user, accessToken, status, errorMessage } = useSelector(
+        (state: RootState) => state.auth
+    );
 
-  async function fetchData() {
-    const response = await fetch(`${config.API_URL}/user/1`);
-    const data = await response.json();
+    const [showSignup, setShowSignup] = useState(false);
+    const [checkingSession, setCheckingSession] = useState(true);
 
-    setUser(data);
+    const [loginMessage, setLoginMessage] = useState<string | null>(null);
 
-  
-  }
+    useEffect(() => {
+        const checkToken = async () => {
+            try {
+                const refresh = await SecureStore.getItemAsync("refreshToken");
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Bienvenido a Home Garden, Ricardo</Text>
-      <Text>{ JSON.stringify(users) }</Text>
-    </View>
-  );
+                if (refresh) {
+                    await dispatch(refreshToken());
+                }
+            } catch (err) {
+                console.log("Error leyendo token:", err);
+            }
+            setCheckingSession(false);
+        };
+
+        checkToken();
+    }, []);
+
+    useEffect(() => {
+        if (!checkingSession && navigationState && accessToken && user) {
+            router.replace("/(tabs)/home");
+        }
+    }, [checkingSession, navigationState, accessToken, user]);
+
+    useEffect(() => {
+        checkWeatherChange();
+        scheduleDailyWeatherNotifications();
+
+        const interval = setInterval(() => {
+            checkWeatherChange();
+        }, 60 * 60 * 1000);
+
+        const morningInterval = setInterval(() => {
+            const now = new Date();
+            if (now.getHours() === 6 && now.getMinutes() === 0) {
+                scheduleDailyWeatherNotifications();
+            }
+        }, 60 * 1000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(morningInterval);
+        };
+    }, []);
+
+    if (checkingSession) {
+        return (
+            <SafeAreaProvider style={{ flex: 1 }}>
+                <PlantLoader />
+            </SafeAreaProvider>
+        );
+    }
+
+    return (
+        <SafeAreaProvider style={{ flex: 1, backgroundColor: "#fff" }}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={{ flex: 1, backgroundColor: "#fff", padding: 5 }}>
+                        {showSignup ? (
+                            <CreateUserForm
+                                onSubmit={(nombre, apellidos, email, pass) => {
+                                    dispatch(registerUser({ nombre, apellidos, email, pass }))
+                                        .unwrap()
+                                        .then(() => {
+                                            setShowSignup(false);
+                                            setLoginMessage("Registro exitoso. Ahora ingresa tus credenciales.");
+                                            dispatch(clearError());
+                                        });
+                                }}
+                                loading={status === "loading"}
+                                onCancel={() => setShowSignup(false)}
+                                message={errorMessage}
+                                messageType={errorMessage ? "error" : "info"}
+                                onCloseMessage={() => dispatch(clearError())}
+                            />
+                        ) : (
+                            <LoginForm
+                                onSubmit={(email, pass) => {
+                                    dispatch(loginUser({ email, pass }));
+                                }}
+                                loading={status === "loading"}
+                                onSignupPress={() => {
+                                    setShowSignup(true);
+                                    setLoginMessage(null);
+                                }}
+                                message={loginMessage || errorMessage}
+                                messageType={
+                                    loginMessage ? "success" : errorMessage ? "error" : "info"
+                                }
+                                onCloseMessage={() => {
+                                    setLoginMessage(null);
+                                    dispatch(clearError());
+                                }}
+                            />
+                        )}
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaProvider>
+    );
 }
