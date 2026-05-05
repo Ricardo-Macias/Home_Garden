@@ -174,7 +174,7 @@ app.use("/favoritos", favoritos);
 */
 
 app.get("/getHistorialRiego/:idHuerto", async (req, res) => {
-    const { idHuerto } = req.params;
+    const { idHuerto } = req.body;
     try {
         const historial = await getHistorialRiego(idHuerto);
         res.json(historial);

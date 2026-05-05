@@ -269,8 +269,8 @@ export default function GardenDetail() {
                                     color="#27ae60"
                                     onPress={() =>
                                         router.push({
-                                            pathname: "./home/HistorialRiego",
-                                            params: { id:3 },
+                                            pathname: "/home/HistorialRiego",
+                                            params: { id:  ultimoRiego.idHuerto},
                                         })
                                     }
                                 />

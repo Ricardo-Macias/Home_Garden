@@ -396,7 +396,7 @@ export async function insertHistorialRiego(idHuerto, duaration) {
 
 export async function getHistorialRiego(idHuerto){
     const rows = await pool.query(
-        `SELECT * FROM historial_regado WHERE "idHuerto" = $1 ORDER BY fecha DESC, hora DESC`
+        `SELECT * FROM historial_regado WHERE "idHuerto" = $1 ORDER BY fecha DESC, hora DESC`,
         [idHuerto]
     );
     return rows.rows;

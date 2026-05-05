@@ -24,7 +24,6 @@ export default function HistorialRiego() {
     useEffect(() => {
         const fetchHistorial = async () => {
             try {
-
                 const response = await axios.get(
                     `${config.API_URL}/getHistorialRiego/${idHuerto}`
                 );
@@ -32,7 +31,7 @@ export default function HistorialRiego() {
                 setHistorial(response.data || []);
             } catch (error) {
                 console.error("Error al cargar historial de riego:", error);
-            }
+            };
         };
 
         if (idHuerto) {
