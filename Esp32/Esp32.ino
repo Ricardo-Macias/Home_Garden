@@ -265,7 +265,7 @@ void saveData(float temperature,float humedity, int soil_moisture, float light){
 
     String json = "{";
     json += "\"device_id\":\"esp32_1\",";
-    json += "\"nombre\":\"" + deviceName + "\",";
+    json += "\"deviceName\":\"" + deviceName + "\",";
     json += "\"temperatura\":" + String(temperature) + ",";
     json += "\"humedadAmbiente\":" + String(humedity) + ",";
     json += "\"humedadSuelo\":" + String(soil_moisture) + ",";
