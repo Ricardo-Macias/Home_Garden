@@ -21,4 +21,4 @@ def should_water(data: SensorData):
 
         return {'irrigation': True, 'seconds': seconds}
     
-    return {"regar": False}
+    return {"irrigation": False, 'seconds':0}
