@@ -11,9 +11,9 @@ def mandani(valueSoilMoisture, valueTemperature, valueLight, valueHumidity):
 
     irrigation = ctrl.Consequent(np.arange(0,121, 1), 'riego')
 
-    soilMoisture['baja'] = fuzz.trapmf(soilMoisture.universe, [0, 0, 30, 40])
-    soilMoisture['optimo'] = fuzz.trimf(soilMoisture.universe, [30, 50, 70]) 
-    soilMoisture['alta'] = fuzz.trapmf(soilMoisture.universe, [60, 75, 100, 100])
+    soilMoisture['baja'] = fuzz.trapmf(soilMoisture.universe, [0, 0, 30, 55]) # [0, 0, 30, 40]
+    soilMoisture['optimo'] = fuzz.trimf(soilMoisture.universe, [50, 70, 80])  # [30, 50, 70]
+    soilMoisture['alta'] = fuzz.trapmf(soilMoisture.universe, [75, 85, 100, 100]) # [60, 75, 100, 100]
 
     temperature['baja'] = fuzz.trapmf(temperature.universe, [0, 0, 6, 14])
     temperature['optimo'] = fuzz.trimf(temperature.universe , [11, 18, 25])
