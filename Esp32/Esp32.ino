@@ -203,7 +203,7 @@ float fuzzy(int hum, float temp, float lux, float humAmb){
     http.begin(FreshApiUrl);
     http.addHeader("Content-Type", "application/json");
 
-    String json = "{\"nombre\":\"" + deviceName + "\",";
+    String json = "{\"deviceName\":\"" + deviceName + "\",";
               "\"soilMoisture\":" + String(hum) + ","
               "\"temperature\":" + String(temp) + ","
               "\"humidity\":" + String(humAmb) + ","
@@ -265,7 +265,7 @@ void saveData(float temperature,float humedity, int soil_moisture, float light){
 
     String json = "{";
     json += "\"device_id\":\"esp32_1\",";
-    json += "\"deviceName\":\"" + deviceName + "\",";
+    json += "\"nombre\":\"" + deviceName + "\",";
     json += "\"temperatura\":" + String(temperature) + ",";
     json += "\"humedadAmbiente\":" + String(humedity) + ",";
     json += "\"humedadSuelo\":" + String(soil_moisture) + ",";
