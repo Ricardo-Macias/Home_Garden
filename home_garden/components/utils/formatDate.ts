@@ -1,11 +1,14 @@
 export const formatDate = (dateString?: string): string => {
     if (!dateString) return "—";
 
-    const date = new Date(dateString);
+    const onlyDate = dateString.split("T")[0];
+    const [year, month, day] = onlyDate.split("-").map(Number);
+
+    const date = new Date(year, month - 1, day);
 
     if (isNaN(date.getTime())) return "—";
 
-    return date.toLocaleDateString("es-ES", {
+    return date.toLocaleDateString("es-MX", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
