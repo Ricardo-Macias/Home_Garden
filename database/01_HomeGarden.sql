@@ -71,7 +71,7 @@ CREATE TABLE historial_regado (
     "idRiego" SERIAL PRIMARY KEY
     "idHuerto" INT NOT NULL,
     fecha DATE DEFAULT(CURRENT_DATE),
-    hora TIME DEFAULT(CURRENT_TIME),
+    hora TIME DEFAULT((NOW() AT TIME ZONE 'America/Mexico_City')::time),
     durecion INT,
     FOREIGN KEY("idHuerto") REFERENCES huerto("idHuerto")
 );
