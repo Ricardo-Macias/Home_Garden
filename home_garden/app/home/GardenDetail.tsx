@@ -354,7 +354,13 @@ function SensorCard({
                 )}
             </View>
 
-            {!(title === "Luz" && isNight) && (
+            {(title === "Temperatura" || title === "Humedad Ambiente") && (
+                <Text style={[GardenDetailStyle.cardValue]}>
+                    {data.valor} {unit}
+                </Text>
+            )}
+
+            {!((title === "Luz" && isNight) || (title === "Temperatura" || title === "Humedad Ambiente")) && (
                 <Text style={[GardenDetailStyle.cardValue, { color: valueColor }]}>
                     {data.valor} {unit}
                 </Text>
