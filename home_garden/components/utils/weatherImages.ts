@@ -42,7 +42,7 @@ const weatherImages: Record<string, any[]> = {
         require("../../assets/images/weather/clouds_scattered_day.png"),
     ],
     clouds_broken: [
-        require("../../assets/images/weather/clouds_broken_day.png"),
+        require("../../assets/images/weather/clouds_few_day.png"),
     ],
     clouds_broken_noche: [
         require("../../assets/images/weather/clouds_broken_day.png"),
