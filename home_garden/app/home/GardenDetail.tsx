@@ -92,27 +92,25 @@ export default function GardenDetail() {
         checkRanges();
     }, [sensorRaw, cultivo]);
 
+    const { data: ultimoRiegoData } = usePolling<any>(
+        `${config.API_URL}/getUltimoRiego`,
+        5000,
+        {
+            method: "POST",
+            data: {
+                idSensor: sensor,
+                huerto: huerto,
+            },
+        }
+    );
+
     useEffect(() => {
-        const fetchUltimoRiego = async () => {
-            if (!id) return;
 
-            try {
-                const response = await axios.post(
-                    `${config.API_URL}/getUltimoRiego`,
-                    {
-                        idSensor: sensor,
-                        huerto: huerto,
-                    }
-                );
+        if (ultimoRiegoData) {
+            setUltimoRiego(ultimoRiegoData);
+        }
 
-                setUltimoRiego(response.data);
-            } catch (error) {
-                console.log("Error al cargar ultimo riego:", error);
-            }
-        };
-
-        fetchUltimoRiego();
-    }, [id]);
+    }, [ultimoRiegoData]);
 
     const edit = async () => {
         router.push({
