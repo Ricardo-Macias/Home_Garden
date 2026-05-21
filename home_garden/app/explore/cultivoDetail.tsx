@@ -65,7 +65,6 @@ export default function CultivoDetail() {
             <View style={styles.container}>
                 <StatusBar barStyle="light-content" />
 
-                {/* header */}
                 <View style={styles.header}>
                     <TouchableOpacity
                         style={styles.backButton}
@@ -78,7 +77,6 @@ export default function CultivoDetail() {
                         {cultivo.nombre}
                     </Text>
                 </View>
-
 
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <Image
@@ -120,23 +118,29 @@ export default function CultivoDetail() {
 
                             <View style={styles.conditionRow}>
                                 <Ionicons name="leaf-outline" size={18} color="#16a34a" />
-                                <Text style={styles.conditionText}>
-                                    Germina en {cultivo.dias_germinacion} días
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Germina en {cultivo.dias_germinacion} días
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={styles.conditionRow}>
                                 <Ionicons name="calendar-outline" size={18} color="#84cc16" />
-                                <Text style={styles.conditionText}>
-                                    Cosecha en {cultivo.dias_cosechar} días
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Cosecha en {cultivo.dias_cosechar} días
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={styles.conditionRow}>
                                 <MaterialCommunityIcons name="ruler" size={18} color="#6b7280" />
-                                <Text style={styles.conditionText}>
-                                    Profundidad: {cultivo.profundidad}
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Profundidad: {cultivo.profundidad}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
 
@@ -145,30 +149,38 @@ export default function CultivoDetail() {
 
                             <View style={styles.conditionRow}>
                                 <Ionicons name="water-outline" size={18} color="#0ea5e9" />
-                                <Text style={styles.conditionText}>
-                                    Humedad Ambiental: {cultivo.humedadAmbiental_min}% - {cultivo.humedadAmbiental_max}%
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Humedad Ambiental: {cultivo.humedadAmbiental_min}% - {cultivo.humedadAmbiental_max}%
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={styles.conditionRow}>
                                 <Ionicons name="water-outline" size={18} color="#0284c7" />
-                                <Text style={styles.conditionText}>
-                                    Humedad Suelo: {cultivo.humedadSuelo_min}% - {cultivo.humedadSuelo_max}%
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Humedad Suelo: {cultivo.humedadSuelo_min}% - {cultivo.humedadSuelo_max}%
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={styles.conditionRow}>
                                 <Ionicons name="thermometer-outline" size={18} color="#ef4444" />
-                                <Text style={styles.conditionText}>
-                                    Temperatura: {cultivo.temperatura_min}°C - {cultivo.temperatura_max}°C
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Temperatura: {cultivo.temperatura_min}°C - {cultivo.temperatura_max}°C
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={styles.conditionRow}>
                                 <Ionicons name="sunny-outline" size={18} color="#facc15" />
-                                <Text style={styles.conditionText}>
-                                    Luz: {cultivo.luz_min} lx - {cultivo.luz_max} lx
-                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.conditionText}>
+                                        Luz: {cultivo.luz_min} lx - {cultivo.luz_max} lx
+                                    </Text>
+                                </View>
                             </View>
                         </View>
 
@@ -246,7 +258,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginBottom: 16,
         elevation: 3,
-        alignItems: "stretch",
+        paddingRight: 20,
     },
     sectionTitle: {
         fontSize: 16,
@@ -259,16 +271,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#4b5563",
         lineHeight: 22,
-        textAlign: "justify",
+        textAlign: "left",
     },
     conditionRow: {
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "flex-start",
         marginTop: 8,
     },
     conditionText: {
         marginLeft: 8,
         fontSize: 14,
         color: "#374151",
+        flexShrink: 1,
     },
 });
