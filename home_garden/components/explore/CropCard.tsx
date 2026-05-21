@@ -39,7 +39,7 @@ export default function CropCard({ item, onPress, isFavorite, onToggleFavorite }
                 <View style={styles.header}>
                     <Text style={styles.title}>{item.nombre}</Text>
 
-                    {/* Corazón de favoritos */}
+                    {/* Corazon de favoritos */}
                     <TouchableOpacity onPress={onToggleFavorite}>
                         {isFavorite ? (
                             <FontAwesome name="heart" size={22} color="#dc2626" />
@@ -55,9 +55,9 @@ export default function CropCard({ item, onPress, isFavorite, onToggleFavorite }
                     <Text style={styles.text}>{item.tipo}</Text>
                 </View>
 
-                {/* Dificultad - barbell - medal*/}
+                {/* Dificultad */}
                 <View style={styles.row}>
-                    <Ionicons name="flash-outline" size={18} color="#2563eb" /> 
+                    <Ionicons name="flash-outline" size={18} color="#2563eb" />
                     <Text style={styles.text}>{item.dificultad}</Text>
                 </View>
 
@@ -82,11 +82,12 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
-        elevation: 3, 
+        elevation: 3,
     },
     image: {
         width: 110,
-        height: 110,
+        height: "100%",
+        resizeMode: "cover",
     },
     info: {
         flex: 1,
