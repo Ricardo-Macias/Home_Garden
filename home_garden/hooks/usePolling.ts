@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from "axios";
 
 export function usePolling<T>(
     url: string,
-    intervalMs: number = 60000, // tiempo maximo
+    intervalMs: number = 60000,
     options?: AxiosRequestConfig
 ) {
     const [data, setData] = useState<T | null>(null);
@@ -15,8 +15,14 @@ export function usePolling<T>(
 
         const fetchData = async () => {
             try {
-                setLoading(true);
-                const response = await axios.get<T>(url, options);
+
+                const response = await axios<T>({
+                    url,
+                    method: options?.method || "GET",
+                    data: options?.data,
+                    headers: options?.headers,
+                });
+
                 setData(response.data);
                 setError(null);
             } catch (err) {
