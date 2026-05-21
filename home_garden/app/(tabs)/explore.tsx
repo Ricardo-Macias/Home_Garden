@@ -79,7 +79,7 @@ export default function Explore() {
 
         if (filters.difficulty.length > 0) {
             result = result.filter((item) =>
-                filters.difficulty.includes(item.dificultad?.toLowerCase())
+                filters.difficulty.includes(item.dificultad?.toLowerCase().trim())
             );
         }
 
