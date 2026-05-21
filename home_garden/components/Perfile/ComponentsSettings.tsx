@@ -1,43 +1,53 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-
-export default function ComponentsSettings(){
-    const options = [
-        { label: "Cuenta y perfil", icon: "person" },
-        { label: "Gestión del perfil", icon: "manage-accounts" },
-        { label: "Estadísticas", icon: "bar-chart" },
-        { label: "Apariencia y accesibilidad", icon: "visibility" },
-        { label: "Acerca de", icon: "info" },
-    ];
-
+export default function ComponentsSettings() {
     return (
-        <View style={styles.optionsContainer}>
-            {options.map((option, index) => (
-                <TouchableOpacity key={index} style={styles.option}>
-                    <MaterialIcons name={option.icon as any} size={24} color="#6A1B9A" />
-                    <Text style={styles.optionText}>{option.label}</Text>
-                </TouchableOpacity>
-            ))}
+        <View style={styles.container}>
+            <Ionicons name="leaf-outline" size={48} color="#2E7D32" />
+            <Text style={styles.title}>Acerca de la aplicación</Text>
+            <Text style={styles.version}>Versión 1.0.0</Text>
+            <Text style={styles.subtitle}>Home_Garden</Text>
+            <Text style={styles.description}>
+                Una aplicación pensada para ayudarte a cuidar tu huerto de manera
+                sostenible y sencilla.
+            </Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    optionsContainer: {
-        gap: 16,
-    },
-    option: {
-        flexDirection: "row",
+    container: {
+        flex: 1,
+        backgroundColor: "#fdfdfd", 
         alignItems: "center",
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: "#D1C4E9",
+        justifyContent: "center",
+        padding: 24,
     },
-    optionText: {
-        marginLeft: 12,
+    title: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "#1B5E20",
+        marginTop: 12,
+        marginBottom: 4,
+    },
+    version: {
         fontSize: 16,
-        color: "#4A148C",
+        color: "#388E3C",
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#2E7D32",
+        marginBottom: 12,
+    },
+    description: {
+        fontSize: 14,
+        color: "#4CAF50",
+        textAlign: "center",
+        lineHeight: 20,
+        marginTop: 8,
     },
 });

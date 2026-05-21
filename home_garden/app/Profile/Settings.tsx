@@ -1,24 +1,19 @@
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import ComponentsSettings from "../../components/Perfile/ComponentsSettings";
+
 export const options = {
     headerShown: false,
 };
+
 export default function SettingsScreen() {
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Configuraciones</Text>
             <ComponentsSettings />
         </ScrollView>
     );
 }
 
-const styles = StyleSheet.create ({
-    title: {
-        fontSize: 26,
-        fontWeight: "bold",
-        color: "#6A1B9A",
-        marginBottom: 20,
-    },
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
@@ -26,6 +21,6 @@ const styles = StyleSheet.create ({
         paddingLeft: 16,
         paddingRight: 16,
         alignItems: "stretch",
-        position: "relative",   
+        position: "relative",
     },
-})
+});
