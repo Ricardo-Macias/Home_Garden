@@ -147,12 +147,10 @@ class WifiCharCallback : public BLECharacteristicCallbacks {
 
     if (characteristic->getUUID().toString() == WIFI_SSID_CHAR_UUID){
       receivedSSID = String(value.c_str());
-      Serial.println("SSID recivido: " + receivedSSID);
     }
 
     else if (characteristic->getUUID().toString() == WIFI_PASS_CHAR_UUID) {
       receivedPassword= String(value.c_str());
-      Serial.println("Password recibido: " + receivedPassword);
 
       if (receivedSSID.length() > 0 && receivedPassword.length() > 0) {
         connectToWiFi();
@@ -310,22 +308,6 @@ void loop() {
     if(millis() - lastTime >= interval || changeSoilMoisture || changeTemperature || changeHumidity || changeLux){
       
       saveData(value.temperature, value.humidity, value.soilMoisture, value.lux);
-      
-      Serial.print("Humedad del suelo: ");
-      Serial.print(value.soilMoisture);
-      Serial.println("%");
-      
-      Serial.print("Temperatura: ");
-      Serial.print(value.temperature);
-      Serial.println("°C");
-
-      Serial.print("Humedad del Ambiente: ");
-      Serial.print(value.humidity);
-      Serial.println("%");
-
-      Serial.print("Luz: ");
-      Serial.print(value.lux);
-      Serial.println(" Lux");
 
       lastTime = millis();
       lastValueHumidity = value.humidity;
@@ -343,13 +325,11 @@ void loop() {
       if (wateringTime != 0){
         digitalWrite(SLAVE, HIGH);
       }
-      Serial.print("-------------> Se prendio la Bomba ");
       Serial.println(wateringTime);
     }
 
     if (watered && (millis() - irrigationStart) >= (wateringTime * 1000)){
       watered = false;
-      Serial.println("-------------> Se Apago la Bomba");
       digitalWrite(SLAVE, LOW);
     }
 
