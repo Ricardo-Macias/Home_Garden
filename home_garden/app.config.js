@@ -6,7 +6,7 @@ export default {
         slug: "home_garden",
         version: "1.0.0",
         orientation: "portrait",
-        icon: "./assets/images/icon.png",
+        icon: "./assets/images/Mora.png",
         scheme: "homegarden",
         userInterfaceStyle: "automatic",
         newArchEnabled: true,
@@ -16,9 +16,8 @@ export default {
         android: {
         adaptiveIcon: {
             backgroundColor: "#E6F4FE",
-            foregroundImage: "./assets/images/android-icon-foreground.png",
-            backgroundImage: "./assets/images/android-icon-background.png",
-            monochromeImage: "./assets/images/android-icon-monochrome.png"
+            foregroundImage: "./assets/images/Mora-foreground.png",
+        
         },
         edgeToEdgeEnabled: true,
         predictiveBackGestureEnabled: false,
@@ -30,7 +29,8 @@ export default {
             "ACCESS_WIFI_STATE",
             "CHANGE_WIFI_STATE"
         ],
-        package: "com.appmodular.home_garden"
+        package: "com.appmodular.home_garden",
+        usesCleartextTraffic:true,
         },
         web: {
         output: "static",
