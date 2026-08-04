@@ -21,44 +21,25 @@ La base de datos está diseñada para almacenar la información de los usuarios,
 
 ## Tablas principales
 
-### usuario
-
-Almacena la información de los usuarios registrados.
-
-### cultivo
-
-Contiene el catálogo de cultivos y sus parámetros ideales de crecimiento.
-
-### sensor
-
-Representa los dispositivos encargados de recopilar información ambiental.
-
-### huerto
-
-Relaciona un cultivo con un sensor y almacena información del seguimiento del cultivo.
-
-### sensor_data
-
-Guarda las mediciones registradas por los sensores.
-
-### favoritos
-
-Permite almacenar los cultivos favoritos de cada usuario.
-
-### historial_regado
-
-Registra los eventos de riego realizados sobre cada huerto.
+| Tabla | Función |
+|--------|---------|
+| **usuario** | Almacena la información de los usuarios. |
+| **cultivo** | Contiene el catálogo de cultivos y sus parámetros. |
+| **sensor** | Registra los dispositivos de monitoreo. |
+| **huerto** | Relaciona un cultivo con un sensor. |
+| **sensor_data** | Guarda las mediciones de los sensores. |
+| **favoritos** | Almacena los cultivos favoritos de cada usuario. |
+| **historial_regado** | Registra el historial de riego de los huertos. |
 
 ## Vistas
 
-### vw_home
-
-Agrupa la información necesaria para mostrar los huertos activos en la pantalla principal de la aplicación.
-
-### vista_historial_huertos
-
-Muestra el historial de los huertos que ya finalizaron su ciclo.
+| Vista | Función |
+|--------|---------|
+| **vw_home** | Muestra la información de los huertos activos. |
+| **vista_historial_huertos** | Muestra el historial de los huertos finalizados. |
 
 ## Evento programado
 
-El archivo **03_Eventos.sql** contiene un evento que se ejecuta diariamente para actualizar automáticamente el estado de los huertos cuya fecha estimada de finalización ha sido alcanzada.
+| Archivo | Función |
+|----------|---------|
+| **03_Eventos.sql** | Actualiza automáticamente el estado de los huertos cuando alcanza la fecha estimada de finalización. |
