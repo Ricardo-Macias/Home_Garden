@@ -8,7 +8,7 @@ La base de datos está diseñada para almacenar la información de los usuarios,
 
 - PostgreSQL
 - SQL
-- pg_cron (eventos programados)
+- pg_cron
 
 ## Contenido
 
