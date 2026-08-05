@@ -36,16 +36,6 @@ El proyecto está conformado por una aplicación móvil, una API REST, una base 
 
 # Estructura del proyecto
 
-```text
-Home_Garden/
-
-├── home_garden/
-├── server/
-├── database/
-├── docs/
-└── README.md
-```
-
 | Carpeta | Descripción |
 |----------|-------------|
 | home_garden | Aplicación móvil desarrollada con React Native. |
