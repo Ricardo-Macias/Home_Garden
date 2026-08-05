@@ -18,6 +18,29 @@ Registrar datos adquiridos del esp32 y de la aplicacion movil.
 - nodeJS
 - render Dashboard
 
+## Estructura del proyecto
+
+- server
+    - controllers
+        - authController.js
+        - cropController.js
+        - cultivoController.js
+        - favoritosController.js
+        - profileController.js
+        - sensorController.js
+        userController.js
+    - images
+    - middleware
+        - verifyToken.js
+    - routes
+        - auth.js
+        - cultivo.js
+        - favoritos.js
+        - profile.js
+        - user.js
+    - app.js
+    -database.js
+
 ## Funcionamiento
 
 - Regitra en la basse de datos.

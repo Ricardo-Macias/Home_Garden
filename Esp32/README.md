@@ -40,6 +40,14 @@ Recolectar las condiciones ambientales de los diferentes sensores para enviarlos
 - Relay
 - Bomba de agua
 
+## Estructura del proyecto
+
+- Arduino
+    - Arduino.ino
+- Esp32
+    - api.h
+    - Esp32.ino
+
 ## Funcionamiento
 
 - Lee los datos de los sensores.
