@@ -42,5 +42,3 @@ Entrada:
 
 Salida
 - Tiempo de riego
-
-## Resultados

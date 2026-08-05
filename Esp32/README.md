@@ -32,8 +32,8 @@ Recolectar las condiciones ambientales de los diferentes sensores para enviarlos
 
 ## Hardware utilizado
 
-- ESP32
-- Arduino
+- ESP32 (Master)
+- Arduino (Slave)
 - DHT11
 - YL-69
 - BH1750
@@ -54,5 +54,3 @@ Cada 5 minutos o al percibir un cambio drastico, el servidor resive como entrada
 - Humedad Ambiental
 - Luz
 - Temperatura
-
-## Resultados
